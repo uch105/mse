@@ -6,7 +6,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.files import File 
-from user_agents import parse
+#from user_agents import parse
 from requests import request
 import requests
 import datetime
