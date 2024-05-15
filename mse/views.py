@@ -383,7 +383,6 @@ def log_in(request):
         email = request.POST.get("email")
         username = create_username(email)
         password = request.POST.get("password")
-        print(Member.objects.get(username=username).password)
         try:
             if password == Member.objects.get(username=username).password:
                 user = User.objects.get(username=username)

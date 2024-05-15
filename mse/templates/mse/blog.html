@@ -97,11 +97,13 @@
                             </div>
                         </div>
                         <div class="reply-box" id="{{ reply.reply_comment_id }}">
+                            {% if user.is_authenticated %}
                             <form action="{% url 'edit-reply-comment' pk=reply.reply_comment_id %}" class="reply-form" method="POST">
                                 {% csrf_token %}
                                 <textarea name="ans" id="textinputfield" placeholder="">{{ reply.reply_comment_body }}</textarea>
                                 <input type="submit" value="Submit" class="submit-btn" id="inputfield submit-btn">
                             </form>
+                            {% endif %}
                         </div>
                         {% endfor %}
                         {% if user.is_authenticated %}
@@ -113,8 +115,8 @@
                             </form>
                         </div>
                     </div>
-                    {% endif %}
                     <a onclick="reveal('{{ comment.comment_id }}')" class="reply fourteen blue bold">&#11148; Reply</a>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>

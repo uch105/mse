@@ -15,11 +15,13 @@
         <p class="regular eighteen">
             <b>Question : </b>{{ q.question_description|safe }}
         </p>
+        {% if user.is_authenticated %}
         <form action="{% url 'answer-question' pk=q.question_id %}" method="POST">
             {% csrf_token %}
             <textarea name="ans" id="textinputfield2" placeholder="Answer this question"></textarea>
             <input type="submit" value="Submit" class="submit-btn" id="inputfield submit-btn">
         </form>
+        {% endif %}
     </div>
     <div class="odfa">
         <p class="regular fourteen">Answers ({{ q.total_answer }})</p>
@@ -46,14 +48,18 @@
                 </div>
                 {% endfor %}
                 <div class="reply-box" id="{{ ans.answer_id }}">
+                    {% if user.is_authenticated %}
                     <form action="{% url 'reply-answer' pk=ans.answer_id %}" class="reply-form" method="POST">
                         {% csrf_token %}
                         <textarea name="ans" id="textinputfield" placeholder="Reply"></textarea>
                         <input type="submit" value="Submit" class="submit-btn" id="inputfield submit-btn">
                     </form>
+                    {% endif %}
                 </div>
             </div>
+            {% if user.is_authenticated %}
             <a onclick="reveal('{{ ans.answer_id }}')" class="reply fourteen blue bold">&#11148; Reply</a>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
