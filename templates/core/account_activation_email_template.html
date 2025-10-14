@@ -1,0 +1,12 @@
+{% autoescape off %}
+Hi {{ user.username }},
+
+Thank you for registering. To complete your registration, please click the link below to activate your account:
+
+https://{{ domain }}/activate/{{ uid }}/{{ token }}
+
+If you did not request this, please ignore this email.
+
+Best regards,
+Your Website Team
+{% endautoescape %}

@@ -1,0 +1,364 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+Job Application - MatSci Hub
+{% endblock %}
+
+{% block meta_links %}
+{% endblock %}
+
+{% block head_scripts %}
+    <style>
+
+        .application-container {
+            flex: 1;
+            padding: 120px 0 50px;
+        }
+
+        /* Application Layout */
+        .application-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            align-items: center;
+        }
+
+        /* Application Form */
+        .application-form-container {
+            margin-bottom: 40px;
+        }
+
+        .form-card {
+            text-align: left;
+            padding: 40px;
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: var(--light);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--light);
+        }
+
+        .form-label .required {
+            color: var(--accent);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--light);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 2px rgba(0, 196, 204, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: var(--gray);
+        }
+
+        .form-hint {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+
+        /* File Upload Styles */
+        .file-upload-container {
+            position: relative;
+        }
+
+        .file-upload-input {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+        }
+
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--secondary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .file-upload-label.has-file {
+            border-color: var(--success);
+            background: rgba(0, 200, 83, 0.1);
+        }
+
+        .file-upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+
+        .file-upload-text {
+            margin-bottom: 10px;
+            color: var(--light);
+        }
+
+        .file-upload-hint {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .file-selected {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--light);
+        }
+
+        .file-selected i {
+            color: var(--success);
+        }
+
+        .remove-file {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            margin-left: auto;
+            padding: 5px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .remove-file:hover {
+            background: rgba(255, 64, 129, 0.2);
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--success), #00a344);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 200, 83, 0.3);
+        }
+
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+
+            .application-container {
+                padding: 100px 0 30px;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 576px) {
+            
+            .form-card {
+                padding: 25px 20px;
+            }
+            
+            .file-upload-label {
+                padding: 30px 15px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <!-- Application Content -->
+    <main class="application-container">
+        <div class="container">
+
+            <!-- Application Layout -->
+            <div class="application-layout">
+                <!-- Application Form -->
+                <div class="application-form-container">
+                    <div class="card form-card">
+                        <h2 class="form-title">{{ career.title }}</h2>
+                        
+                        <!-- Application Form -->
+                        <form id="applicationForm" action="{% url 'career-apply' pk=career.id %}" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <div class="form-group">
+                                <label for="phone" class="form-label">
+                                    Phone Number <span class="required">*</span>
+                                </label>
+                                <input 
+                                    type="tel" 
+                                    id="phone" 
+                                    class="form-control" 
+                                    placeholder="+1 (555) 123-4567"
+                                    name="phone"
+                                    required
+                                >
+                                <div class="form-hint">Include country code</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Resume/CV <span class="required">*</span>
+                                </label>
+                                <div class="file-upload-container">
+                                    <input 
+                                        type="file" 
+                                        id="resume" 
+                                        class="file-upload-input" 
+                                        accept=".pdf,.doc,.docx,.txt"
+                                        required
+                                    >
+                                    <label for="resume" class="file-upload-label" id="fileUploadLabel">
+                                        <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+                                        <div class="file-upload-text">Upload your resume</div>
+                                        <div class="file-upload-hint">PDF, DOC, DOCX, TXT (Max 5MB)</div>
+                                    </label>
+                                    <div id="fileSelected" class="file-selected" style="display: none;">
+                                        <i class="fas fa-file-alt"></i>
+                                        <span id="fileName">document.pdf</span>
+                                        <button type="button" class="remove-file" id="removeFile">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="portfolio" class="form-label">
+                                    Portfolio/LinkedIn URL
+                                </label>
+                                <input 
+                                    type="url" 
+                                    id="portfolio" 
+                                    class="form-control" 
+                                    placeholder="https://linkedin.com/in/yourprofile or https://github.com/yourusername"
+                                    name="links"
+                                >
+                                <div class="form-hint">Optional</div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary btn-full" onclick="window.history.back()">
+                                    <i class="fas fa-arrow-left"></i> Back to Jobs
+                                </button>
+                                <button type="submit" class="btn btn-primary btn-full btn-submit">
+                                    Submit Application <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+    // Mobile menu functionality
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // File upload functionality
+        const fileInput = document.getElementById('resume');
+        const fileUploadLabel = document.getElementById('fileUploadLabel');
+        const fileSelected = document.getElementById('fileSelected');
+        const fileName = document.getElementById('fileName');
+        const removeFileBtn = document.getElementById('removeFile');
+
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                fileName.textContent = file.name;
+                fileSelected.style.display = 'flex';
+                fileUploadLabel.classList.add('has-file');
+                
+                // Validate file size (5MB max)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB');
+                    this.value = '';
+                    fileSelected.style.display = 'none';
+                    fileUploadLabel.classList.remove('has-file');
+                }
+                
+                // Validate file type
+                const allowedTypes = ['.pdf', '.doc', '.docx', '.txt'];
+                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                if (!allowedTypes.includes(fileExtension)) {
+                    alert('Please upload a PDF, DOC, DOCX, or TXT file');
+                    this.value = '';
+                    fileSelected.style.display = 'none';
+                    fileUploadLabel.classList.remove('has-file');
+                }
+            }
+        });
+
+        removeFileBtn.addEventListener('click', function() {
+            fileInput.value = '';
+            fileSelected.style.display = 'none';
+            fileUploadLabel.classList.remove('has-file');
+        });
+
+        // Add animation to form elements
+        const formElements = document.querySelectorAll('.form-group');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        formElements.forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(element);
+        });
+    });
+</script>
+{% endblock %}

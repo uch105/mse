@@ -1,0 +1,331 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+Terms and Conditions
+{% endblock %}
+
+{% block meta_links %}
+{% endblock %}
+
+{% block head_scripts %}
+<style>
+    /* Legal Content Styles */
+    .legal-container {
+        flex: 1;
+        padding: 120px 0 50px;
+    }
+
+    .legal-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+    .legal-title {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .legal-subtitle {
+        color: var(--gray);
+        font-size: 1.1rem;
+    }
+
+    .legal-content {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .legal-card {
+        text-align: left;
+    }
+
+    /* Markdown Content Styles */
+    .markdown-content {
+        line-height: 1.8;
+    }
+
+    .markdown-content h1 {
+        font-size: 2rem;
+        margin: 30px 0 20px;
+        color: var(--secondary);
+        border-bottom: 2px solid var(--card-border);
+        padding-bottom: 10px;
+    }
+
+    .markdown-content h2 {
+        font-size: 1.6rem;
+        margin: 25px 0 15px;
+        color: var(--secondary);
+    }
+
+    .markdown-content h3 {
+        font-size: 1.3rem;
+        margin: 20px 0 12px;
+        color: var(--light);
+    }
+
+    .markdown-content p {
+        margin-bottom: 16px;
+    }
+
+    .markdown-content ul, .markdown-content ol {
+        margin: 15px 0 15px 30px;
+    }
+
+    .markdown-content li {
+        margin-bottom: 8px;
+    }
+
+    .markdown-content strong {
+        color: var(--secondary);
+        font-weight: 600;
+    }
+
+    .markdown-content a {
+        color: var(--primary);
+        transition: var(--transition);
+    }
+
+    .markdown-content a:hover {
+        color: var(--secondary);
+        text-decoration: underline;
+    }
+
+    .markdown-content blockquote {
+        border-left: 4px solid var(--primary);
+        padding-left: 20px;
+        margin: 20px 0;
+        color: var(--gray);
+        font-style: italic;
+    }
+
+    .markdown-content code {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+    }
+
+    .markdown-content pre {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 20px;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 20px 0;
+        border: 1px solid var(--card-border);
+    }
+
+    .markdown-content pre code {
+        background: none;
+        padding: 0;
+    }
+
+    .markdown-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+
+    .markdown-content th, .markdown-content td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid var(--card-border);
+    }
+
+    .markdown-content th {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--secondary);
+        font-weight: 600;
+    }
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        
+        .legal-container {
+            padding: 100px 0 30px;
+        }
+        
+        .legal-title {
+            font-size: 2rem;
+        }
+        
+        .markdown-content h1 {
+            font-size: 1.7rem;
+        }
+        
+        .markdown-content h2 {
+            font-size: 1.4rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .legal-title {
+            font-size: 1.8rem;
+        }
+        
+        .markdown-content h1 {
+            font-size: 1.5rem;
+        }
+        
+        .markdown-content h2 {
+            font-size: 1.3rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="legal-container">
+    <div class="legal-header">
+        <h1 class="legal-title">Terms of Service</h1>
+        <p class="legal-subtitle">Last updated: December 1, 2024</p>
+    </div>
+    
+    <div class="legal-content">
+        <div class="card legal-card">
+            <div id="markdown-content" class="markdown-content">
+                <!-- Markdown content will be rendered here by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+        // Terms of Service Markdown Content
+        const termsMarkdown = `
+# Terms of Service
+
+## 1. Acceptance of Terms
+
+By accessing and using MaterialsScience.net ("the Platform"), you accept and agree to be bound by the terms and provision of this agreement.
+
+### 1.1 Eligibility
+You must be at least 16 years old to use our Platform. By using MaterialsScience.net, you represent and warrant that you meet this age requirement.
+
+## 2. Description of Service
+
+MaterialsScience.net provides:
+
+- **Materials Database**: Comprehensive database with material properties
+- **MatSciGPT**: AI-powered research assistant
+- **Community Forum**: Discussion platform for materials science enthusiasts
+- **Learning Resources**: Educational content and software tools
+
+### 2.1 Service Modifications
+We reserve the right to modify or discontinue, temporarily or permanently, the Service with or without notice.
+
+## 3. User Accounts
+
+### 3.1 Account Creation
+To access certain features, you must create an account with accurate and complete information.
+
+### 3.2 Account Security
+You are responsible for maintaining the confidentiality of your account credentials.
+
+\`\`\`
+Security Requirements:
+- Use strong passwords
+- Enable two-factor authentication
+- Notify us of any unauthorized access
+\`\`\`
+
+## 4. User Conduct
+
+### 4.1 Prohibited Activities
+You agree not to:
+
+- Violate any applicable laws or regulations
+- Infringe upon intellectual property rights
+- Distribute malware or harmful code
+- Engage in unauthorized data collection
+- Interfere with service operation
+
+### 4.2 Content Guidelines
+| Content Type | Allowed | Restrictions |
+|-------------|---------|-------------|
+| Research Data | ✅ | Must be properly cited |
+| Forum Posts | ✅ | Professional and respectful |
+| Software Tools | ✅ | Open source or properly licensed |
+| Commercial Content | ❌ | No unauthorized advertising |
+
+## 5. Intellectual Property
+
+### 5.1 Our Content
+All content provided through the Platform, including but not limited to:
+
+- Database entries
+- AI models
+- Software tools
+- Documentation
+
+is protected by copyright and other intellectual property laws.
+
+### 5.2 User Content
+You retain ownership of content you create and share, but grant us a license to display and distribute it through our Platform.
+
+## 6. Subscription and Payments
+
+### 6.1 Free Tier
+Our free tier includes:
+
+- Basic material database access
+- Limited MatSciGPT queries
+- Community forum participation
+
+### 6.2 Premium Plans
+| Feature | Free | Pro | Advanced |
+|---------|------|-----|----------|
+| MatSciGPT Queries | 10/day | Unlimited | Unlimited |
+| Database Access | Basic | Full | Full + API |
+| Support | Email | Priority | Dedicated |
+
+### 6.3 Billing
+- Payments are processed securely
+- Subscriptions auto-renew
+- Cancel anytime
+
+## 7. Termination
+
+We may suspend or terminate your account if you violate these Terms. You may terminate your account at any time.
+
+## 8. Disclaimer of Warranties
+
+THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+## 9. Limitation of Liability
+
+IN NO EVENT SHALL MATERIALSSCIENCE.NET BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES.
+
+## 10. Governing Law
+
+These Terms shall be governed by the laws of the State of California, without regard to its conflict of law provisions.
+
+## 11. Changes to Terms
+
+We reserve the right to modify these terms at any time. Continued use of the Service constitutes acceptance of modified terms.
+
+## 12. Contact Information
+
+For questions about these Terms, please contact us at:
+
+- Email: legal@materialsscience.net
+- Address: 123 Innovation Drive, Tech Valley, CA 94025
+
+---
+
+*These Terms of Service were last updated on December 1, 2024.*
+`;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const markdownContainer = document.getElementById('markdown-content');
+    markdownContainer.innerHTML = marked.parse(termsMarkdown);
+});
+    </script>
+{% endblock %}

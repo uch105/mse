@@ -1,0 +1,290 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+Dashboard - {{ profile.full_name }} |  MatSci Hub
+{% endblock %}
+
+{% block meta_links %}
+{% endblock %}
+
+{% block head_scripts %}
+<style>
+    .profile-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        justify-content: center;
+        padding: 20px;
+        margin-bottom: 30px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: var(--dark);
+    }
+    .profile-picture {
+        flex: 1 1 200px;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+    }
+    .profile-picture img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 10px;
+    }
+    .profile-details {
+        flex: 2 1 300px;
+        max-width: 100%;
+        text-align: left;
+    }
+    .profile-details p {
+        font-size: 1.1em;
+        margin: 8px 0;
+    }
+    .profile-details i {
+        margin-right: 10px;
+        color: #007BFF;
+    }
+    .profile-intersts {
+        flex: 1 1 200px;
+        max-width: 100%;
+        text-align: left;
+    }
+    .profile-intersts h3 {
+        margin: 10px 0px;
+    }
+    .profile-intersts ul {
+        list-style-type: none;
+        padding-left: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .profile-intersts ul li {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--gray);
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+    }
+
+    .scores-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        justify-content: center;
+        padding: 20px;
+        margin-bottom: 30px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: var(--dark);
+    }
+    .score-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    .score {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        border-radius: 8px;
+        text-align: left;
+    }
+    .score h3 {
+        margin-bottom: 10px;
+    }
+    .score-description {
+        font-size: 0.9em;
+        color: var(--gray);
+    }
+    /* Progress Bar Styling */
+    .score-graph {
+        margin-top: 20px;
+        text-align: center;
+        background: #1e1e1e;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .score-graph-button {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .score-graph-button p {
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .progress-bar-container {
+        width: 100%;
+        height: 25px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .progress-bar {
+        height: 100%;
+        text-align: center;
+        line-height: 25px;
+        color: white;
+        background: linear-gradient(90deg, var(--primary), var(--secondary)); /* Gradient from primary to secondary color */
+        border-radius: 12px;
+        width: 0%; /* Default width */
+        transition: width 0.5s ease; /* Smooth transition when the width changes */
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .profile-summary {
+            grid-template-columns: 1fr;
+            text-align: left;
+            gap: 20px;
+        }
+        .score-details {
+            grid-template-columns: 1fr;
+        }
+    }
+    @media screen and (max-width: 540px) {
+        .profile-picture img {
+            width: 80px;
+            height: 80px;
+        }
+        .score-graph-button {
+            flex-direction: column;
+            gap: 15px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<main>
+    <div class="container">
+        <section class="dashboard-intro">
+            <h1 class="section-title">Hello, {{ profile.full_name }}</h1>
+            <p class="section-subtitle">{{ profile.bio }}</p>
+
+            <!-- Profile Summary -->
+            <div class="profile-summary">
+                <div class="profile-picture">
+                    {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" alt="Profile Picture">
+                    {% else %}
+                    <img src="{% static 'images/user-default.png' %}" alt="Default Profile Picture">
+                    {% endif %}
+                    <a href="{% url 'edit-dashboard' %}" class="btn btn-secondary">Edit Profile</a>
+                </div>
+                <div class="profile-details">
+                    <p><i class="fas fa-university"></i>  {{ profile.institution }}</p>
+                    <p><i class="fas fa-graduation-cap"></i> {{ profile.degree }}</p>
+                    <p><i class="fas fa-briefcase"></i> {{ profile.specialization }}</p>
+                    <p><i class="fa-brands fa-linkedin"></i> <a href="{{ profile.linkedin }}">LinkedIn ID</a></p>
+                    <p><i class="fa-solid fa-location-dot"></i> {{ profile.country }}</p>
+                </div>
+                <div class="profile-intersts">
+                    <h3>Interests</h3>
+                    <ul>
+                        {% for interest in profile.interest_list %}
+                        <li>{{ interest }}</li>
+                        {% empty %}
+                        <li>No interests added yet.</li>
+                        {% endfor %}
+                    </ul>
+                    <h3>Skills</h3>
+                    <ul>
+                        {% for skill in profile.skill_list %}
+                        <li>{{ skill }}</li>
+                        {% empty %}
+                        <li>No skills added yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Scoring Sections -->
+        <section class="dashboard-scores">
+            <h2 class="section-title">Your Dashboard</h2>
+            <p class="section-subtitle">Quick overview of your activities</p>
+
+            <div class="scores-grid">
+                <div class="score-graph">
+                    <div class="score-graph-button">
+                        <p>{{ profile.level }}</p>
+                        <p>Score : {{ profile.score }}</p>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div id="id-profile-score" style="display: none;">{{ profile.score|floatformat:2 }}</div>
+                        <div id="progress-bar" class="progress-bar"></div>
+                    </div>
+                </div>
+                <div class="score-details">
+                    <div class="score">
+                        <h3>Materials Added ({{ profile.materials_added }})</h3>
+                        <p class="score-description">Total materials you've added or contributed.<br>Scoring pattern: materials_added * 5</p>
+                    </div>
+                    <div class="score">
+                        <h3>Forum Posts ({{ profile.datasets_uploaded }})</h3>
+                        <p class="score-description">Total posts you've made in the forum.<br>Scoring pattern: datasets_uploaded * 10</p>
+                    </div>
+                    <div class="score">
+                        <h3>Forum Posts ({{ profile.forum_posts }})</h3>
+                        <p class="score-description">Total posts you've made in the forum.<br>Scoring pattern: forum_posts * 2</p>
+                    </div>
+                    <div class="score">
+                        <h3>Forum Comments ({{ profile.forum_comments }})</h3>
+                        <p class="score-description">Total comments you've made in the forum.<br>Scoring pattern: forum_comments * 1</p>
+                    </div>
+                    <div class="score">
+                        <h3>Blogs Published ({{ profile.blogs_published }})</h3>
+                        <p class="score-description">Total blogs you've written in the platform.<br>Scoring pattern: blogs_published * 8</p>
+                    </div>
+                    <div class="score">
+                        <h3>Books Added ({{ profile.books_contributed }})</h3>
+                        <p class="score-description">Total books you've added or contributed.<br>Scoring pattern: books_contributed * 6</p>
+                    </div>
+                    <div class="score">
+                        <h3>Softwares or API Contributions ({{ profile.api_contributions }})</h3>
+                        <p class="score-description">Total softwares or APIs you've contributed in the platform.<br>Scoring pattern: api_contributions * 12</p>
+                    </div>
+                    <div class="score">
+                        <h3>AI Queries ({{ profile.ai_queries }})</h3>
+                        <p class="score-description">Total AI queries you've made in the MatSciGPT.<br>Scoring pattern: ai_queries * 0.5</p>
+                    </div>
+                </div>
+        </section>
+    </div>
+</main>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+// Calculate and update progress bar width based on user's score
+window.onload = function() {
+    const userScore = document.getElementById('id-profile-score').innerText; // Get user's score (e.g., 498.55)
+    const maxScore = 1000; // Define the max score (Research Master level)
+    const progressBar = document.getElementById('progress-bar');
+
+    // Calculate the percentage for the progress bar
+    const widthPercentage = (userScore / maxScore) * 100;
+
+    // Set the width of the progress bar and display the score
+    progressBar.style.width = widthPercentage.toFixed(2) + '%';
+};
+</script>
+{% endblock %}

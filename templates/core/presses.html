@@ -1,0 +1,263 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+Press Releases - Materials Science Hub
+{% endblock %}
+
+{% block meta_links %}
+{% endblock %}
+
+{% block head_scripts %}
+<style>
+    /* Press Releases Specific Styles */
+    .press-container {
+        flex: 1;
+        padding: 120px 0 50px;
+    }
+
+    .press-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .press-title {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .press-subtitle {
+        color: var(--gray);
+        font-size: 1.2rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    /* Press Releases Grid */
+    .press-grid {
+        display: grid;
+        gap: 30px;
+        margin-bottom: 50px;
+    }
+
+    .press-card {
+        text-align: left;
+        padding: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .press-category {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--secondary);
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-bottom: 15px;
+    }
+
+    .press-date {
+        color: var(--gray);
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .press-title-card {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: var(--light);
+        line-height: 1.4;
+    }
+
+    .press-excerpt {
+        color: var(--gray);
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .press-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .press-tags {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .press-tag {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--gray);
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+    }
+
+    .read-more {
+        color: var(--secondary);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: var(--transition);
+    }
+
+    .read-more:hover {
+        color: var(--primary);
+        gap: 12px;
+    }
+
+    /* Media Contact */
+    .media-contact {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 40px;
+        text-align: center;
+        margin-top: 60px;
+        border: 1px solid var(--card-border);
+    }
+
+    .media-contact h3 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: var(--secondary);
+    }
+
+    .media-contact p {
+        color: var(--gray);
+        margin-bottom: 25px;
+    }
+
+    .contact-info {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--light);
+    }
+
+    .contact-item i {
+        color: var(--secondary);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {   
+        .press-container {
+            padding: 100px 0 30px;
+        }
+        
+        .press-title {
+            font-size: 2.2rem;
+        }
+        
+        .contact-info {
+            flex-direction: column;
+            gap: 15px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .btn {
+            width: 100%;
+            max-width: 250px;
+        }
+        
+        .press-title {
+            font-size: 1.8rem;
+        }
+        
+        .press-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .press-tags {
+            justify-content: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Press Releases Content -->
+<main class="press-container">
+    <div class="container">
+        <!-- Header Section -->
+        <section class="press-header">
+            <h1 class="press-title">Press Releases</h1>
+            <p class="press-subtitle">Stay updated with the latest news, announcements, and milestones from Materials Science Hub</p>
+        </section>
+
+        <!-- Press Releases Grid -->
+        <section class="press-grid">
+            {% for press in presses %}
+            <article class="card press-card">
+                <span class="press-category">{{ press.category }}</span>
+                <div class="press-date">
+                    <i class="far fa-calendar"></i>
+                    {{ press.published_at|date:"F j, Y" }}
+                </div>
+                <h2 class="press-title-card">{{ press.title }}</h2>
+                <p class="press-excerpt">{{ press.disclaimer|safe }}</p>
+                <div class="press-meta">
+                    <div class="press-tags">
+                        {% for tag in press.tag_list %}
+                        <span class="press-tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'press' pk=press.id %}" class="read-more">
+                        Read More <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </article>
+            {% empty %}
+            <p>No press releases available at the moment. Please check back later.</p>
+            {% endfor %}
+        </section>
+
+        <!-- Media Contact Section -->
+        <section class="media-contact">
+            <h3>Media Inquiries</h3>
+            <p>For press-related questions, interview requests, or media partnerships, please contact our communications team.</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>press@materialsscience.net</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>+1 (555) 123-4567</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-download"></i>
+                    <span>Download Media Kit</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}
+
+{% block body_scripts %}
+{% endblock %}

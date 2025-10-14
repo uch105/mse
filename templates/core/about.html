@@ -1,0 +1,442 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+About - MatSci Hub
+{% endblock %}
+
+{% block meta_links %}
+{% endblock %}
+
+{% block head_scripts %}
+<style>
+    /* About Us Specific Styles */
+    .about-container {
+        flex: 1;
+        padding: 120px 0 50px;
+    }
+
+    .about-header {
+        text-align: center;
+        margin-bottom: 80px;
+    }
+
+    .about-title {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .about-subtitle {
+        color: var(--gray);
+        font-size: 1.2rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    /* Mission & Vision Section */
+    .mission-vision {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 40px;
+        margin-bottom: 80px;
+    }
+
+    .mission-card, .vision-card {
+        text-align: left;
+        padding: 40px;
+    }
+
+    .mission-icon, .vision-icon {
+        font-size: 3rem;
+        margin-bottom: 25px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .mission-title, .vision-title {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        color: var(--secondary);
+    }
+
+    /* Team Section */
+    .team-section {
+        margin-bottom: 80px;
+    }
+
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+    }
+
+    .team-card {
+        text-align: center;
+        padding: 30px;
+    }
+
+    .team-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        border: 3px solid var(--secondary);
+        object-fit: cover;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+    }
+
+    .team-image img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .team-name {
+        font-size: 1.4rem;
+        margin-bottom: 10px;
+        color: var(--light);
+    }
+
+    .team-role {
+        color: var(--secondary);
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 1rem;
+    }
+
+    .team-bio {
+        color: var(--gray);
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+    }
+
+    .team-social {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .team-social a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        transition: var(--transition);
+        color: var(--light);
+    }
+
+    .team-social a:hover {
+        background: var(--primary);
+        transform: translateY(-3px);
+    }
+
+    /* Founder Message Section */
+    .founder-message {
+        margin-bottom: 80px;
+    }
+
+    .founder-card {
+        text-align: left;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .founder-content {
+        max-width: 800px;
+        text-align: center;
+    }
+
+    .founder-quote {
+        font-size: 1.3rem;
+        line-height: 1.8;
+        color: var(--light);
+        margin-bottom: 30px;
+        font-style: italic;
+        position: relative;
+    }
+
+    .founder-quote::before,
+    .founder-quote::after {
+        content: '"';
+        font-size: 3rem;
+        color: var(--secondary);
+        opacity: 0.5;
+        position: absolute;
+    }
+
+    .founder-quote::before {
+        top: -20px;
+        left: -30px;
+    }
+
+    .founder-quote::after {
+        bottom: -40px;
+        right: -30px;
+    }
+
+    .founder-signature {
+        font-size: 1.1rem;
+        color: var(--secondary);
+        font-weight: 600;
+        margin-top: 20px;
+    }
+
+    /* Stats Section */
+    .stats-section {
+        margin-bottom: 80px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+    }
+
+    .stat-card {
+        text-align: center;
+        padding: 30px 20px;
+    }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .stat-label {
+        color: var(--gray);
+        font-size: 1rem;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        text-align: center;
+        padding: 60px 0;
+        background: radial-gradient(circle at center, rgba(26, 115, 232, 0.1), transparent 70%);
+        border-radius: 20px;
+    }
+
+    .cta-title {
+        font-size: 2.2rem;
+        margin-bottom: 20px;
+        color: var(--light);
+    }
+
+    .cta-subtitle {
+        color: var(--gray);
+        margin-bottom: 30px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .about-container {
+            padding: 100px 0 30px;
+        }
+        
+        .about-title {
+            font-size: 2.2rem;
+        }
+        
+        .mission-vision {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        .mission-card, .vision-card {
+            padding: 30px;
+        }
+        
+        .team-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .founder-quote::before {
+            left: -10px;
+        }
+        
+        .founder-quote::after {
+            right: -10px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .about-title {
+            font-size: 1.8rem;
+        }
+        
+        .mission-title, .vision-title {
+            font-size: 1.5rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .stat-number {
+            font-size: 2.2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- About Us Content -->
+    <main class="about-container">
+        <div class="container">
+            <!-- Header Section -->
+            <section class="about-header">
+                <h1 class="about-title">About Materials Science Hub</h1>
+                <p class="about-subtitle">We're building the world's most comprehensive platform for materials science research, education, and collaboration. Our mission is to accelerate innovation by connecting researchers, students, and professionals with cutting-edge tools and resources.</p>
+            </section>
+
+            <!-- Mission & Vision Section -->
+            <section class="mission-vision">
+                <div class="card mission-card">
+                    <div class="mission-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h2 class="mission-title">Our Mission</h2>
+                    <p>To democratize access to materials science knowledge and tools, enabling researchers, engineers, and students worldwide to accelerate innovation in materials development and application.</p>
+                    <p>We believe that by providing comprehensive resources, AI-powered assistance, and a collaborative community, we can help solve some of the world's most pressing materials challenges.</p>
+                </div>
+                
+                <div class="card vision-card">
+                    <div class="vision-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h2 class="vision-title">Our Vision</h2>
+                    <p>To become the definitive global platform for materials science, where every researcher, student, and professional can access the tools, data, and community needed to push the boundaries of materials innovation.</p>
+                    <p>We envision a future where materials discovery is accelerated through AI, collaboration, and open access to scientific knowledge.</p>
+                </div>
+            </section>
+
+            <!-- Founder Section -->
+            <section class="founder-message">
+                <h2 class="section-title">Founder's Message</h2>
+                <div class="card founder-card">
+                    <div class="team-image">
+                        <img src="{% static 'images/founder.jpg' %}" alt="Tanvir Saklan">
+                    </div>
+                    <div class="founder-content">
+                        <h3 class="team-name">Tanvir Saklan</h3>
+                        <p class="team-role">Founder</p>
+                        <blockquote class="founder-quote">
+                            During my studies in the Department of Materials Science & Engineering, I faced several limitations while searching for good learning materials. Therefore, I decided to create a platform that would provide comprehensive resources for students and researchers in materials science. My goal is to make high-quality educational content accessible to everyone, fostering a global community of materials scientists and engineers.
+                        </blockquote>
+                        <p class="founder-signature">- Tanvir Saklan</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Team Section -->
+            <section class="team-section">
+                <h2 class="section-title">Meet Our Team</h2>
+                <p class="section-subtitle">Passionate experts driving innovation in materials science</p>
+                
+                <div class="team-grid">
+                    {% for member in members %}
+                    <div class="card team-card">
+                        <div class="team-image">
+                            {% if member.profile.profile_picture %}
+                            <img src="{{ member.profile.profile_picture.url }}" alt="{{ member.profile.full_name }}">
+                            {% else %}
+                            <i class="fas fa-user"></i>
+                            {% endif %}
+                        </div>
+                        <h3 class="team-name">{{ member.profile.full_name }}</h3>
+                        <p class="team-role">{{ member.role }}</p>
+                        <p class="team-bio">{{ member.details }}</p>
+                        <div class="team-social">
+                            <a href="{{ member.profile.linkedin }}" target="_blank"><i class="fab fa-linkedin"></i></a>
+                            <a href="mailto:{{ member.profile.user.email }}" target="_blank"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section class="stats-section">
+                <h2 class="section-title">Our Impact</h2>
+                <p class="section-subtitle">Driving innovation across the materials science community</p>
+                
+                <div class="stats-grid">
+                    <div class="card stat-card">
+                        <div class="stat-number">10,000+</div>
+                        <div class="stat-label">Materials in Database</div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-number">5,000+</div>
+                        <div class="stat-label">Active Users</div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Professors</div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-number">100+</div>
+                        <div class="stat-label">Researchers</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="cta-section">
+                <h2 class="cta-title">Join Our Mission</h2>
+                <p class="cta-subtitle">Become part of the growing community that's shaping the future of materials science</p>
+                <a href="{% url 'register' %}" class="btn btn-primary">Join Our Community</a>
+            </section>
+        </div>
+    </main>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+    // Add animation to team cards on scroll
+    const teamCards = document.querySelectorAll('.team-card');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    teamCards.forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(card);
+    });
+</script>
+{% endblock %}

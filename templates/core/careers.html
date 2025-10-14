@@ -1,0 +1,498 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+Careers - Materails Science Hub
+{% endblock %}
+
+{% block meta_links %}
+{% endblock %}
+
+{% block head_scripts %}
+<style>
+    /* Careers Specific Styles */
+    .careers-container {
+        flex: 1;
+        padding: 120px 0 50px;
+    }
+
+    .careers-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .careers-title {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .careers-subtitle {
+        color: var(--gray);
+        font-size: 1.2rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    /* Jobs Grid */
+    .jobs-grid {
+        display: grid;
+        gap: 25px;
+        margin-bottom: 50px;
+    }
+
+    .job-card {
+        text-align: left;
+        padding: 30px;
+        position: relative;
+    }
+
+    .job-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: var(--secondary);
+        color: var(--dark);
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .job-badge.Remote {
+        background: var(--success);
+    }
+
+    .job-badge.Urgent {
+        background: var(--accent);
+    }
+
+    .job-department {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--secondary);
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+    }
+
+    .job-title {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        color: var(--light);
+        line-height: 1.4;
+    }
+
+    .job-meta {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .job-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
+
+    .job-meta-item i {
+        color: var(--secondary);
+    }
+
+    .job-description {
+        color: var(--gray);
+        margin-bottom: 25px;
+        line-height: 1.6;
+    }
+
+    .job-requirements {
+        margin-bottom: 25px;
+    }
+
+    .requirements-title {
+        font-size: 1rem;
+        margin-bottom: 10px;
+        color: var(--light);
+        font-weight: 600;
+    }
+
+    .requirements-list {
+        color: var(--gray);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .requirements-list li {
+        margin-bottom: 5px;
+        position: relative;
+        padding-left: 15px;
+    }
+
+    .requirements-list li::before {
+        content: '•';
+        color: var(--secondary);
+        position: absolute;
+        left: 0;
+    }
+
+    .job-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .job-tags {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .job-tag {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--gray);
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+    }
+
+    .apply-btn {
+        padding: 10px 25px;
+        font-size: 0.9rem;
+    }
+
+    /* No Jobs Message */
+    .no-jobs {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--gray);
+    }
+
+    .no-jobs-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: var(--gray);
+        opacity: 0.5;
+    }
+
+    /* Application Process */
+    .process-section {
+        margin: 80px 0;
+    }
+
+    .process-steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+    }
+
+    .process-step {
+        text-align: center;
+        padding: 30px 20px;
+        position: relative;
+    }
+
+    .step-number {
+        width: 50px;
+        height: 50px;
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0 auto 20px;
+    }
+
+    .step-title {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        color: var(--light);
+    }
+
+    .step-description {
+        color: var(--gray);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .careers-container {
+            padding: 100px 0 30px;
+        }
+        
+        .careers-title {
+            font-size: 2.2rem;
+        }
+        
+        .job-actions {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        
+        .job-tags {
+            justify-content: flex-start;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .careers-title {
+            font-size: 1.8rem;
+        }
+        
+        .job-meta {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .benefits-grid,
+        .culture-grid,
+        .process-steps {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Careers Content -->
+<main class="careers-container">
+    <div class="container">
+        <!-- Header Section -->
+        <section class="careers-header">
+            <h1 class="careers-title">Build the Future of Materials Science</h1>
+            <p class="careers-subtitle">Join our mission to accelerate materials innovation through cutting-edge AI, comprehensive databases, and collaborative tools. Help us empower researchers and engineers worldwide.</p>
+        </section>
+
+        <!-- Job Openings Section -->
+        <section class="jobs-section">
+            <h2 class="section-title">Current Openings</h2>
+            <p class="section-subtitle">Explore opportunities to join our growing team</p>
+
+            <!-- Jobs Grid -->
+            <div class="jobs-grid">
+            {% for career in careers %}
+                <div class="card job-card" data-department="engineering" data-remote="true">
+                    <span class="job-badge {{ career.employment_type }}">{{ career.employment_type }}</span>
+                    <span class="job-department">Engineering</span>
+                    <h3 class="job-title">{{ career.title }}</h3>
+                    <div class="job-meta">
+                        <div class="job-meta-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>{{ career.employment_type }} • {{ career.location }}</span>
+                        </div>
+                        <div class="job-meta-item">
+                            <i class="fas fa-briefcase"></i>
+                            <span>{{ career.job_type }}</span>
+                        </div>
+                        <div class="job-meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Posted: {{ career.posted_at }}</span>
+                        </div>
+                    </div>
+                    <p class="job-description">{{ career.description }}</p>
+                    <div class="job-requirements">
+                        <h4 class="requirements-title">Key Responsibilities:</h4>
+                        <ul class="requirements-list">
+                            {{ career.key_responsibilities|safe }}
+                        </ul>
+                    </div>
+                    <div class="job-requirements">
+                        <h4 class="requirements-title">Qualifications:</h4>
+                        <ul class="requirements-list">
+                            {{ career.qualifications|safe }}
+                        </ul>
+                    </div>
+                    <div class="job-requirements">
+                        <h4 class="requirements-title">Compensation & Benefits:</h4>
+                        <ul class="requirements-list">
+                            {{ career.compensation|safe }}
+                        </ul>
+                    </div>
+                    <div class="job-requirements">
+                        <h4 class="requirements-title">Deadline: {{ career.application_deadline }}</h4>
+                    </div>
+                    <div class="job-actions">
+                        <div class="job-tags">
+                            {% for tag in career.tag_list %}
+                            <span class="job-tag">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        <a href="{% url 'career-apply' pk=career.id %}" class="btn btn-primary apply-btn">Apply Now</a>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No jobs available</p>
+            {% endfor %}
+            </div>
+        </section>
+
+        <!-- Application Process -->
+        <section class="process-section">
+            <h2 class="section-title">Our Hiring Process</h2>
+            <div class="process-steps">
+                <div class="card process-step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Application Review</h3>
+                    <p class="step-description">Our team reviews your application and portfolio within 3-5 business days.</p>
+                </div>
+                <div class="card process-step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Initial Interview</h3>
+                    <p class="step-description">30-minute video call to discuss your experience and interests.</p>
+                </div>
+                <div class="card process-step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Technical Assessment</h3>
+                    <p class="step-description">Role-specific challenge to showcase your skills and approach.</p>
+                </div>
+                <div class="card process-step">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title">Team Interviews</h3>
+                    <p class="step-description">Meet with potential teammates and discuss collaborative projects.</p>
+                </div>
+                <div class="card process-step">
+                    <div class="step-number">5</div>
+                    <h3 class="step-title">Offer</h3>
+                    <p class="step-description">We extend an offer and welcome you to the Materials Science Hub team!</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+        // Mobile menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const navLinks = document.querySelector('.nav-links');
+            const navCta = document.querySelector('.nav-cta');
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                if (navLinks.style.display === 'flex') {
+                    navLinks.style.display = 'none';
+                    navCta.style.display = 'none';
+                } else {
+                    navLinks.style.display = 'flex';
+                    navCta.style.display = 'flex';
+                    navLinks.style.flexDirection = 'column';
+                    navLinks.style.position = 'absolute';
+                    navLinks.style.top = '100%';
+                    navLinks.style.left = '0';
+                    navLinks.style.width = '100%';
+                    navLinks.style.background = 'rgba(10, 10, 10, 0.95)';
+                    navLinks.style.padding = '20px';
+                    navLinks.style.gap = '15px';
+                    
+                    navCta.style.flexDirection = 'column';
+                    navCta.style.position = 'absolute';
+                    navCta.style.top = 'calc(100% + 150px)';
+                    navCta.style.left = '0';
+                    navCta.style.width = '100%';
+                    navCta.style.background = 'rgba(10, 10, 10, 0.95)';
+                    navCta.style.padding = '20px';
+                    navCta.style.gap = '15px';
+                }
+            });
+
+            // Job filtering functionality
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const jobCards = document.querySelectorAll('.job-card');
+            const searchInput = document.querySelector('.search-box input');
+            
+            // Filter by department/type
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    const filter = this.textContent.toLowerCase();
+                    
+                    // Filter job cards
+                    jobCards.forEach(card => {
+                        if (filter === 'all departments') {
+                            card.style.display = 'block';
+                        } else if (filter === 'remote') {
+                            const isRemote = card.getAttribute('data-remote') === 'true';
+                            card.style.display = isRemote ? 'block' : 'none';
+                        } else {
+                            const department = card.getAttribute('data-department');
+                            if (department && department.includes(filter)) {
+                                card.style.display = 'block';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+            });
+
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                jobCards.forEach(card => {
+                    const title = card.querySelector('.job-title').textContent.toLowerCase();
+                    const description = card.querySelector('.job-description').textContent.toLowerCase();
+                    const tags = Array.from(card.querySelectorAll('.job-tag')).map(tag => tag.textContent.toLowerCase());
+                    
+                    if (title.includes(searchTerm) || 
+                        description.includes(searchTerm) || 
+                        tags.some(tag => tag.includes(searchTerm))) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+
+            // Add animation to job cards on scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            jobCards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+
+            // Apply button functionality
+            const applyBtns = document.querySelectorAll('.apply-btn');
+            applyBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const jobTitle = this.closest('.job-card').querySelector('.job-title').textContent;
+                    alert(`Thank you for your interest in the "${jobTitle}" position! Our team will review your application.`);
+                });
+            });
+        });
+    </script>
+{% endblock %}

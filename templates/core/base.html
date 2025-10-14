@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/icon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <title>
+        {% block title %}{% endblock %}
+    </title>
+
+    {% block meta_links %}
+    {% endblock %}
+
+    {% block head_scripts %}
+    {% endblock %}
+
+</head>
+<body>
+
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">
+            <span class="message-text">{{ message }}</span>
+            <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block navbar %}
+    <!-- Header & Navigation -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="{% url 'index' %}" class="logo">MatSci Hub</a>
+                
+                <div class="nav-links">
+                    <a href="{% url 'materials' %}">Materials</a>
+                    <a href="{% url 'matscichat' %}">MatSciChat</a>
+                    <a href="{% url 'resources' %}">Resources</a>
+                    <a href="{% url 'forum' %}">Forum</a>
+                </div>
+
+                {% if request.user.is_authenticated %}
+                <div class="nav-cta">
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Dashboard</a>
+                    <a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
+                </div>
+                {% else %}
+                <div class="nav-cta">
+                    <a href="{% url 'login' %}" class="btn btn-secondary">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-primary">Join Now</a>
+                </div>
+                {% endif %}
+                
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+    {% endblock %}
+
+    {% block body %}
+    {% endblock %}
+
+    {% block footer %}
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>MaterialsScience.net</h3>
+                    <p>The ultimate hub for materials science enthusiasts, researchers, and professionals.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Explore</h3>
+                    <ul>
+                        <li><a href="{% url 'materials' %}">Materials Database</a></li>
+                        <li><a href="{% url 'matscichat' %}">MatSciChat</a></li>
+                        <li><a href="{% url 'resources' %}">Resources</a></li>
+                        <li><a href="{% url 'forum' %}">Forum</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Community</h3>
+                    <ul>
+                        <li><a href="{% url 'about' %}">About Us</a></li>
+                        <li><a href="{% url 'careers' %}">Careers</a></li>
+                        <li><a href="{% url 'presses' %}">Press</a></li>
+                        <li><a href="{% url 'privacy' %}">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="{% url 'blogs' %}">Blogs</a></li>
+                        <li><a href="{% url 'api-docs' %}">API Documentation</a></li>
+                        <li><a href="{% url 'pricing' %}">Pricing</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2024 MaterialsScience.net. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <script>
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+            const navLinks = document.querySelector('.nav-links');
+            const navCta = document.querySelector('.nav-cta');
+            
+            if (navLinks.style.display === 'flex') {
+                navLinks.style.display = 'none';
+                navCta.style.display = 'none';
+            } else {
+                navLinks.style.display = 'flex';
+                navCta.style.display = 'flex';
+                navLinks.style.flexDirection = 'column';
+                navLinks.style.position = 'absolute';
+                navLinks.style.top = '100%';
+                navLinks.style.left = '0';
+                navLinks.style.width = '100%';
+                navLinks.style.background = 'rgba(10, 10, 10, 0.95)';
+                navLinks.style.padding = '20px';
+                navLinks.style.gap = '15px';
+                
+                navCta.style.flexDirection = 'column';
+                navCta.style.position = 'absolute';
+                navCta.style.top = 'calc(100% + 150px)';
+                navCta.style.left = '0';
+                navCta.style.width = '100%';
+                navCta.style.background = 'rgba(10, 10, 10, 0.95)';
+                navCta.style.padding = '20px';
+                navCta.style.gap = '15px';
+            }
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(10, 10, 10, 0.95)';
+            } else {
+                header.style.background = 'rgba(10, 10, 10, 0.9)';
+            }
+        });
+    </script>
+
+    <script>
+        // Get all elements with the class 'markdown-content'
+        const markdownDivs = document.querySelectorAll('.markdown-content');
+
+        // Loop through each element
+        markdownDivs.forEach(div => {
+            // Get the raw Markdown text from the div
+            const markdownText = div.innerText;
+            
+            // Convert the Markdown to HTML and replace the div's content
+            div.innerHTML = marked.parse(markdownText);
+        });
+    </script>
+
+    <script>
+        // Auto-hide messages after 5 seconds
+        document.addEventListener("DOMContentLoaded", function() {
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(msg => {
+                setTimeout(() => {
+                    msg.style.animation = "fadeOut 0.4s ease-in-out";
+                    setTimeout(() => msg.remove(), 400);
+                }, 5000); // 5 seconds
+            });
+        });
+    </script>
+
+    {% block body_scripts %}
+    {% endblock %}
+    
+</body>
+</html>

@@ -1,0 +1,102 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+Pricing - MatSci Hub
+{% endblock %}
+
+{% block meta_links %}
+{% endblock %}
+
+{% block head_scripts %}
+<style>
+    .pricing-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+    }
+
+    .pricing-card {
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .pricing-card.featured {
+        transform: scale(1.05);
+        border: 2px solid var(--secondary);
+    }
+
+    .pricing-card.featured::before {
+        content: 'POPULAR';
+        position: absolute;
+        top: 20px;
+        right: -30px;
+        background: var(--secondary);
+        color: var(--dark);
+        padding: 5px 30px;
+        transform: rotate(45deg);
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+    .price {
+        font-size: 3rem;
+        margin: 20px 0;
+        font-weight: 700;
+    }
+
+    .price span {
+        font-size: 1rem;
+        color: var(--gray);
+    }
+
+    .pricing-features {
+        margin: 30px 0;
+    }
+
+    .pricing-features li {
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .pricing-features li:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<section id="pricing" class="section" style="margin-top: 20px;">
+    <div class="container">
+        <h2 class="section-title">Choose Your Plan</h2>
+        <p class="section-subtitle">Flexible pricing options to suit researchers, students, and professionals</p>
+        
+        <div class="pricing-cards">
+            <div class="card pricing-card">
+                <h3>Free</h3>
+                <div class="price">&#2547;0 <span>/month</span></div>
+                <ul class="pricing-features">
+                    <li>100 MatSciGPT queries per day</li>
+                    <li>Basic learning resources</li>
+                </ul>
+                <a href="{% url 'register' %}" class="btn btn-secondary">Get Started</a>
+            </div>
+            
+            <div class="card pricing-card featured">
+                <h3>Pro</h3>
+                <div class="price">&#2547;49 <span>/month</span></div>
+                <ul class="pricing-features">
+                    <li>Unlimited MatSciGPT queries</li>
+                    <li>Premium learning resources</li>
+                </ul>
+                <a href="{% url 'checkout' %}?plan=pro" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+{% endblock %}
