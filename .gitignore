@@ -1,0 +1,54 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+**/migrations/__pycache__/
+
+# ---- Virtual environment ----
+venv/
+env/
+.venv/
+
+# ---- IDE / Editor files ----
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# ---- OS files ----
+.DS_Store
+Thumbs.db
+
+# ---- Environment & Secrets ----
+.env
+*.env
+*.key
+*.pem
+*.cert
+secrets.json
+
+# ---- Django ----
+*.log
+media/
+staticfiles/
+db.sqlite3
+local_settings.py
+
+# ---- Build / Compiled files ----
+dist/
+build/
+
+# ---- Backups ----
+*.bak
+*.swp
+*.tmp
+
+# ---- Coverage / Tests ----
+.coverage
+htmlcov/
+pytest_cache/
+
+# ---- Cache ----
+__pycache__/
+*.cache/
+.cache/
