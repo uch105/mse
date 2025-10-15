@@ -1,0 +1,15 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /forum/
+Disallow: /dashboard/
+Disallow: /behind-the-desk/
+Disallow: /matscichat/
+Allow: /
+Allow: /materials/
+Allow: /blogs/
+Allow: /careers/
+Allow: /api-docs/
+Allow: /pricing/
+Allow: /resources/
+
+Sitemap: https://materialsscience.net/sitemap.xml
