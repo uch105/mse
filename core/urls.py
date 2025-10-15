@@ -10,7 +10,7 @@ urlpatterns = [
     path('forgotpassword/', views.forgotpassword, name='forgotpassword'),
     path('resetpassword/<uidb64>/<token>/', views.resetpassword, name='resetpassword'),
     path('dashboard/', views.dashboard, name='dashboard'),
-    path('edit-dashboard/', views.edit_dashboard, name='edit-dashboard'),
+    path('dashboard/edit/', views.edit_dashboard, name='edit-dashboard'),
     path('about/', views.about, name='about'),
     path('careers/', views.careers, name='careers'),
     path('careers/apply/<int:pk>/', views.career_apply, name='career-apply'),
@@ -31,4 +31,21 @@ from django.views.static import serve
 urlpatterns += [
     re_path(r'^media/(?P<path>.*)$', serve , {'document_root': settings.MEDIA_ROOT}),
     re_path(r'^static/(?P<path>.*)$', serve , {'document_root': settings.STATIC_ROOT}),
+]
+
+# For search ranking
+
+from django.views.generic import TemplateView
+
+urlpatterns += [
+    path('robots.txt',  TemplateView.as_view(template_name="robots.txt", content_type="text/plain"), name='robots.txt'),
+]
+
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import StaticViewSitemap
+
+sitemaps = {'static': StaticViewSitemap}
+
+urlpatterns += [
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 ]
