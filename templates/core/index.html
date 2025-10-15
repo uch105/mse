@@ -7,6 +7,26 @@ MatSci Hub - A Platform for Materials Science Enthusiasts
 
 {% block meta_links %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
+
+<!-- Title and Description -->
+<meta name="description" content="An ML-powered platform for materials science engineers and researchers. Explore materials data, collaborate, and access the MatSciChat.">
+<meta name="keywords" content="materials science, engineering, materials database, MatSciChat, materials data,">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:title" content="MatSci Hub - A Platform for Materials Science Enthusiasts">
+<meta property="og:description" content="An ML-powered platform for materials science engineers and researchers. Explore materials data, collaborate, and access the MatSciChat.">
+<meta property="og:image" content="https://materialsscience.net/static/images/icon.jpg">
+<meta property="og:url" content="https://materialsscience.net/">
+<meta property="og:type" content="website">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MatSci Hub - A Platform for Materials Science Enthusiasts">
+<meta name="twitter:description" content="An ML-powered platform for materials science engineers and researchers. Explore materials data, collaborate, and access the MatSciChat.">
+<meta name="twitter:image" content="https://materialsscience.net/static/images/icon.jpg">
+
+<!-- Canonical URL -->
+<link rel="canonical" href="https://materialsscience.net/">
 {% endblock %}
 
 {% block head_scripts %}
@@ -58,7 +78,7 @@ MatSci Hub - A Platform for Materials Science Enthusiasts
                 
                 <div class="card">
                     <i class="fas fa-robot feature-icon"></i>
-                    <h3 class="feature-title">MatSciGPT</h3>
+                    <h3 class="feature-title">MatSciChat</h3>
                     <p>ML-powered assistant specialized in materials science. Get precise, calculated responses to your research questions and calculations.</p>
                 </div>
                 
@@ -159,33 +179,33 @@ MatSci Hub - A Platform for Materials Science Enthusiasts
     <!-- MatSciGPT Preview -->
     <section id="matscigpt" class="section">
         <div class="container">
-            <h2 class="section-title">MatSciGPT</h2>
+            <h2 class="section-title">MatSciChat</h2>
             <p class="section-subtitle">Your ML-powered research assistant specialized in materials science</p>
             
             <div class="chat-preview">
                 <div class="chat-header">
                     <i class="fas fa-robot" style="color: var(--secondary);"></i>
-                    <h3>MatSciGPT Assistant</h3>
+                    <h3>MatSciChat Assistant</h3>
                 </div>
                 
                 <div class="chat-body">
-                    <div class="message bot-message">
-                        Hello! I'm your MatSciGPT assistant. How can I help with your materials science research today?
+                    <div class="chat-message bot-message">
+                        Hello! I'm your MatSciChat assistant. How can I help with your materials science research today?
                     </div>
                     
-                    <div class="message user-message">
+                    <div class="chat-message user-message">
                         What are the key differences between austenitic and martensitic stainless steels?
                     </div>
                     
-                    <div class="message bot-message">
+                    <div class="chat-message bot-message">
                         Austenitic stainless steels have a face-centered cubic structure, are non-magnetic, and contain high levels of chromium and nickel. They offer excellent corrosion resistance. Martensitic stainless steels have a body-centered tetragonal structure, are magnetic, and contain higher carbon levels. They can be heat treated for high strength but have lower corrosion resistance.
                     </div>
                     
-                    <div class="message user-message">
+                    <div class="chat-message user-message">
                         Calculate the theoretical density of copper given its atomic properties.
                     </div>
                     
-                    <div class="message bot-message">
+                    <div class="chat-message bot-message">
                         Copper has an FCC crystal structure with atomic radius 0.128 nm. The unit cell edge length a = 4r/√2 = 0.361 nm. With 4 atoms per unit cell and atomic mass 63.55 g/mol, theoretical density = (4 × 63.55) / (6.022×10²³ × (3.61×10⁻⁸)³) = 8.96 g/cm³.
                     </div>
                 </div>
@@ -209,7 +229,7 @@ MatSci Hub - A Platform for Materials Science Enthusiasts
                     <h3>Free</h3>
                     <div class="price">&#2547;0 <span>/month</span></div>
                     <ul class="pricing-features">
-                        <li>100 MatSciGPT queries per day</li>
+                        <li>100 MatSciChat queries per day</li>
                         <li>Basic learning resources</li>
                     </ul>
                     <a href="{% url 'register' %}" class="btn btn-secondary">Get Started</a>
@@ -219,7 +239,7 @@ MatSci Hub - A Platform for Materials Science Enthusiasts
                     <h3>Pro</h3>
                     <div class="price">&#2547;49 <span>/month</span></div>
                     <ul class="pricing-features">
-                        <li>Unlimited MatSciGPT queries</li>
+                        <li>Unlimited MatSciChat queries</li>
                         <li>Premium learning resources</li>
                     </ul>
                     <a href="{% url 'checkout' %}?plan=pro" class="btn btn-primary">Get Started</a>

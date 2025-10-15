@@ -6,6 +6,11 @@ Pricing - MatSci Hub
 {% endblock %}
 
 {% block meta_links %}
+
+<!-- Title and Description -->
+<meta name="description" content="MatSci Hub Pricing Plans - Choose the plan that fits your needs, from free access to premium features for researchers and professionals.">
+<meta name="keywords" content="matscichat pricing, matscihub plans, materials science subscription, research tools pricing">
+
 {% endblock %}
 
 {% block head_scripts %}
@@ -78,7 +83,7 @@ Pricing - MatSci Hub
                 <h3>Free</h3>
                 <div class="price">&#2547;0 <span>/month</span></div>
                 <ul class="pricing-features">
-                    <li>100 MatSciGPT queries per day</li>
+                    <li>100 MatSciChat queries per day</li>
                     <li>Basic learning resources</li>
                 </ul>
                 <a href="{% url 'register' %}" class="btn btn-secondary">Get Started</a>
@@ -88,7 +93,7 @@ Pricing - MatSci Hub
                 <h3>Pro</h3>
                 <div class="price">&#2547;49 <span>/month</span></div>
                 <ul class="pricing-features">
-                    <li>Unlimited MatSciGPT queries</li>
+                    <li>Unlimited MatSciChat queries</li>
                     <li>Premium learning resources</li>
                 </ul>
                 <a href="{% url 'checkout' %}?plan=pro" class="btn btn-primary">Get Started</a>

@@ -153,7 +153,8 @@ Read the official beta launch announcement:
 
 ## 🧾 License
 
-This project is licensed under the [Apache License 2.0](./LICENSE).
+This project is licensed under the Apache License 2.0. You may use, modify, and distribute the code, including for commercial purposes, as long as you comply with the terms of the license. See the [LICENSE](./LICENSE) file fore details.  
+If you distribute the code, you must provide a copy of the license and include a NOTICE file with any required attributions.
 
 ---
 
