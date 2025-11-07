@@ -1,0 +1,484 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+{{ profile_user.forum_profile.get_display_name }} - MatSci Hub Forum
+{% endblock %}
+
+{% block meta_links %}
+<style>
+    .profile-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    /* Profile Header */
+    .profile-header {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    .profile-avatar-large {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        border: 4px solid #e0e7ff;
+    }
+
+    .profile-avatar-large img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-info {
+        flex: 1;
+    }
+
+    .profile-info h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2rem;
+        color: #2d3748;
+    }
+
+    .profile-meta {
+        display: flex;
+        gap: 2rem;
+        margin: 1rem 0;
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    .profile-meta .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .profile-bio {
+        margin: 1rem 0;
+        color: #4b5563;
+        line-height: 1.6;
+    }
+
+    .profile-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .stat-box {
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .stat-box .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+        display: block;
+    }
+
+    .stat-box .stat-label {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 0.25rem;
+    }
+
+    /* Tabs */
+    .profile-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .tab-btn {
+        padding: 1rem 1.5rem;
+        background: none;
+        border: none;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        font-weight: 600;
+        color: #666;
+        transition: all 0.3s;
+    }
+
+    .tab-btn:hover {
+        color: var(--primary);
+    }
+
+    .tab-btn.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    /* Topics/Replies List */
+    .content-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .content-item {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .content-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 0.75rem;
+    }
+
+    .content-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin: 0;
+    }
+
+    .content-title a {
+        color: #2d3748;
+        text-decoration: none;
+    }
+
+    .content-title a:hover {
+        color: var(--primary);
+    }
+
+    .content-meta {
+        display: flex;
+        gap: 1rem;
+        color: #666;
+        font-size: 0.9rem;
+        flex-wrap: wrap;
+    }
+
+    .content-excerpt {
+        color: #4b5563;
+        line-height: 1.6;
+        margin: 0.75rem 0;
+    }
+
+    .content-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .category-tag {
+        display: inline-block;
+        padding: 0.3rem 0.75rem;
+        background: #e0e7ff;
+        color: #3730a3;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .content-stats {
+        display: flex;
+        gap: 1.5rem;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #e0e0e0;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #666;
+    }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+    }
+
+    .pagination a, .pagination span {
+        padding: 0.5rem 1rem;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #2d3748;
+    }
+
+    .pagination a:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .pagination .current {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .profile-header {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .profile-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .profile-tabs {
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            white-space: nowrap;
+        }
+
+        .content-header {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .content-footer {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: start;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<main>
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar-large">
+                <img src="{{ profile.get_avatar_url }}" alt="{{ profile_user.username }}">
+            </div>
+            <div class="profile-info">
+                <h1>{{ profile.get_display_name }}</h1>
+                <div class="profile-meta">
+                    <div class="meta-item">
+                        <i class="fa fa-user"></i>
+                        <span>@{{ profile_user.username }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fa fa-calendar"></i>
+                        <span>Joined {{ profile_user.date_joined|date:"F Y" }}</span>
+                    </div>
+                    {% if profile.location %}
+                    <div class="meta-item">
+                        <i class="fa fa-map-marker"></i>
+                        <span>{{ profile.location }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if profile.bio %}
+                <p class="profile-bio">{{ profile.bio }}</p>
+                {% endif %}
+                <div class="profile-stats">
+                    <div class="stat-box">
+                        <span class="stat-value">{{ profile.reputation }}</span>
+                        <span class="stat-label">Reputation</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value">{{ profile.topic_count }}</span>
+                        <span class="stat-label">Topics</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value">{{ profile.reply_count }}</span>
+                        <span class="stat-label">Replies</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value">{{ profile.total_posts }}</span>
+                        <span class="stat-label">Total Posts</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="profile-tabs">
+            <button class="tab-btn active" data-tab="topics">Topics</button>
+            <button class="tab-btn" data-tab="replies">Replies</button>
+        </div>
+
+        <!-- Topics Tab -->
+        <div class="tab-content active" id="topics-tab">
+            {% if topics %}
+            <div class="content-list">
+                {% for topic in topics %}
+                <div class="content-item">
+                    <div class="content-header">
+                        <h3 class="content-title">
+                            <a href="{% url 'forum:topic_detail' slug=topic.slug %}">{{ topic.title }}</a>
+                        </h3>
+                    </div>
+                    <p class="content-excerpt">{{ topic.get_excerpt }}</p>
+                    <div class="content-footer">
+                        <a href="{% url 'forum:category' slug=topic.category.slug %}" class="category-tag">
+                            {{ topic.category.icon }} {{ topic.category.name }}
+                        </a>
+                        <div class="content-stats">
+                            <span><i class="fa fa-eye"></i> {{ topic.views }}</span>
+                            <span><i class="fa fa-comment"></i> {{ topic.reply_count }}</span>
+                            <span><i class="fa fa-arrow-up"></i> {{ topic.upvote_count }}</span>
+                            <span><i class="fa fa-clock-o"></i> {{ topic.created_at|timesince }} ago</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if topics.has_other_pages %}
+            <div class="pagination">
+                {% if topics.has_previous %}
+                <a href="?topics_page={{ topics.previous_page_number }}{% if request.GET.replies_page %}&replies_page={{ request.GET.replies_page }}{% endif %}">&laquo; Previous</a>
+                {% endif %}
+                
+                <span class="current">Page {{ topics.number }} of {{ topics.paginator.num_pages }}</span>
+                
+                {% if topics.has_next %}
+                <a href="?topics_page={{ topics.next_page_number }}{% if request.GET.replies_page %}&replies_page={{ request.GET.replies_page }}{% endif %}">Next &raquo;</a>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="empty-state">
+                <i class="fa fa-inbox"></i>
+                <h3>No Topics Yet</h3>
+                <p>{{ profile_user.username }} hasn't created any topics yet.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Replies Tab -->
+        <div class="tab-content" id="replies-tab">
+            {% if replies %}
+            <div class="content-list">
+                {% for reply in replies %}
+                <div class="content-item">
+                    <div class="content-header">
+                        <h3 class="content-title">
+                            <a href="{% url 'forum:topic_detail' slug=reply.topic.slug %}">{{ reply.topic.title }}</a>
+                        </h3>
+                    </div>
+                    <p class="content-excerpt">{{ reply.content|truncatewords:30 }}</p>
+                    <div class="content-footer">
+                        <a href="{% url 'forum:category' slug=reply.topic.category.slug %}" class="category-tag">
+                            {{ reply.topic.category.icon }} {{ reply.topic.category.name }}
+                        </a>
+                        <div class="content-stats">
+                            <span><i class="fa fa-arrow-up"></i> {{ reply.upvote_count }}</span>
+                            <span><i class="fa fa-clock-o"></i> {{ reply.created_at|timesince }} ago</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if replies.has_other_pages %}
+            <div class="pagination">
+                {% if replies.has_previous %}
+                <a href="?replies_page={{ replies.previous_page_number }}{% if request.GET.topics_page %}&topics_page={{ request.GET.topics_page }}{% endif %}">&laquo; Previous</a>
+                {% endif %}
+                
+                <span class="current">Page {{ replies.number }} of {{ replies.paginator.num_pages }}</span>
+                
+                {% if replies.has_next %}
+                <a href="?replies_page={{ replies.next_page_number }}{% if request.GET.topics_page %}&topics_page={{ request.GET.topics_page }}{% endif %}">Next &raquo;</a>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="empty-state">
+                <i class="fa fa-comment-o"></i>
+                <h3>No Replies Yet</h3>
+                <p>{{ profile_user.username }} hasn't posted any replies yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const tabName = this.dataset.tab;
+        
+        // Update active tab button
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Update active tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(tabName + '-tab').classList.add('active');
+    });
+});
+</script>
+{% endblock %}

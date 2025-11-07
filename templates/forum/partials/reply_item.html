@@ -1,0 +1,89 @@
+{% load static %}
+<div class="comment-item" data-reply-id="{{ reply.id }}">
+    <div class="comment-header">
+        <div class="comment-avatar">
+            <img src="{{ reply.author.forum_profile.get_avatar_url }}" alt="{{ reply.author.username }}">
+        </div>
+        <div class="comment-info">
+            <a href="{% url 'forum:user_profile' username=reply.author.username %}" class="comment-author">{{ reply.author.forum_profile.get_display_name }}</a>
+            <span class="comment-time">{{ reply.created_at|timesince }} ago</span>
+        </div>
+    </div>
+    <div class="comment-body">{{ reply.content }}</div>
+    <div class="comment-footer">
+        <button class="comment-action {% if user.is_authenticated and user in reply.upvotes.all %}voted{% endif %}" 
+                data-action="vote" 
+                data-reply-id="{{ reply.id }}" 
+                data-vote-type="upvote"
+                {% if not user.is_authenticated %}disabled title="Login to vote"{% endif %}>
+            <i class="fa fa-thumbs-up"></i> {{ reply.upvote_count }}
+        </button>
+        {% if user.is_authenticated %}
+        <button class="comment-action" data-action="reply">
+            <i class="fa fa-reply"></i> Reply
+        </button>
+        <button class="comment-action" onclick="openReportModal('reply', `{{ reply.id }}`)">
+            <i class="fa fa-flag"></i> Report
+        </button>
+        {% endif %}
+    </div>
+
+    <!-- Reply Form -->
+    {% if user.is_authenticated %}
+    <div class="reply-form" data-parent-id="{{ reply.id }}">
+        <textarea placeholder="Write your reply..."></textarea>
+        <div class="reply-form-actions">
+            <button class="btn-cancel">Cancel</button>
+            <button class="btn-submit">Post Reply</button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Nested Replies -->
+    {% if reply.has_replies %}
+    <div class="comment-replies">
+        {% for nested_reply in reply.get_nested_replies %}
+        <div class="reply-item" data-reply-id="{{ nested_reply.id }}">
+            <div class="reply-header">
+                <div class="reply-avatar">
+                    <img src="{{ nested_reply.author.forum_profile.get_avatar_url }}" alt="{{ nested_reply.author.username }}">
+                </div>
+                <div class="reply-info">
+                    <a href="{% url 'forum:user_profile' username=nested_reply.author.username %}" class="reply-author">{{ nested_reply.author.forum_profile.get_display_name }}</a>
+                    <span class="reply-time">{{ nested_reply.created_at|timesince }} ago</span>
+                </div>
+            </div>
+            <div class="reply-body">{{ nested_reply.content }}</div>
+            <div class="reply-footer">
+                <button class="reply-action {% if user.is_authenticated and user in nested_reply.upvotes.all %}voted{% endif %}" 
+                        data-action="vote" 
+                        data-reply-id="{{ nested_reply.id }}" 
+                        data-vote-type="upvote"
+                        {% if not user.is_authenticated %}disabled title="Login to vote"{% endif %}>
+                    <i class="fa fa-thumbs-up"></i> {{ nested_reply.upvote_count }}
+                </button>
+                {% if user.is_authenticated %}
+                <button class="reply-action" data-action="reply">
+                    <i class="fa fa-reply"></i> Reply
+                </button>
+                <button class="reply-action" onclick="openReportModal('reply', `{{ nested_reply.id }}`)">
+                    <i class="fa fa-flag"></i> Report
+                </button>
+                {% endif %}
+            </div>
+
+            <!-- Nested Reply Form -->
+            {% if user.is_authenticated %}
+            <div class="reply-form" data-parent-id="{{ nested_reply.id }}" style="margin-left: 0;">
+                <textarea placeholder="Write your reply..."></textarea>
+                <div class="reply-form-actions">
+                    <button class="btn-cancel">Cancel</button>
+                    <button class="btn-submit">Post Reply</button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>

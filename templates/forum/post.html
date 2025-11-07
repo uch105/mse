@@ -1,0 +1,1534 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+{{ topic.title }} - MatSci Hub Forum
+{% endblock %}
+
+{% block meta_links %}
+<style>
+    .post-detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    /* Breadcrumb Navigation */
+    .breadcrumb {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .breadcrumb a {
+        color: var(--primary);
+        text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+    /* Django Messages */
+    .messages {
+        max-width: 1200px;
+        margin: 1rem auto;
+        padding: 0 1rem;
+    }
+
+    .alert {
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert.success {
+        background: #d1fae5;
+        color: #065f46;
+        border-left: 4px solid #10b981;
+    }
+
+    .alert.error {
+        background: #fee2e2;
+        color: #991b1b;
+        border-left: 4px solid #ef4444;
+    }
+
+    .alert.info {
+        background: #dbeafe;
+        color: #1e40af;
+        border-left: 4px solid #3b82f6;
+    }
+
+    .alert .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: inherit;
+        opacity: 0.7;
+    }
+
+    .alert .close-btn:hover {
+        opacity: 1;
+    }
+
+    /* Main Post Card */
+    .main-post {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .post-header {
+        padding: 2rem;
+        border-bottom: 1px solid #eef2f5;
+    }
+
+    .post-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+
+    .category-badge {
+        display: inline-block;
+        padding: 0.3rem 0.75rem;
+        background: #e0e7ff;
+        color: #3730a3;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .pinned-badge, .featured-badge, .solved-badge {
+        display: inline-block;
+        padding: 0.3rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .pinned-badge {
+        background: #ffedd5;
+        color: #b45309;
+    }
+
+    .featured-badge {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .solved-badge {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .post-main-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 1rem 0;
+        line-height: 1.3;
+    }
+
+    .post-tags {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+
+    .tag {
+        display: inline-block;
+        padding: 0.3rem 0.75rem;
+        background: #f3f4f6;
+        color: #4b5563;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+    .tag:hover {
+        background: #e5e7eb;
+    }
+
+    /* Author Info Section */
+    .post-author-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        background: #f8fafc;
+        border-bottom: 1px solid #eef2f5;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .author-details {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .author-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+
+    .author-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .author-info-text h4 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: #2d3748;
+    }
+
+    .author-info-text h4 a {
+        color: #2d3748;
+        text-decoration: none;
+    }
+
+    .author-info-text h4 a:hover {
+        color: var(--primary);
+    }
+
+    .author-info-text p {
+        margin: 0.25rem 0 0 0;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .post-stats {
+        display: flex;
+        gap: 2rem;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Voting Section */
+    .voting-section {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .vote-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border: 2px solid #eef2f5;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #2d3748;
+        transition: all 0.3s ease;
+    }
+
+    .vote-btn:hover:not(:disabled) {
+        border-color: var(--primary);
+        background: #f8fafc;
+    }
+
+    .vote-btn.upvoted {
+        border-color: var(--secondary);
+        color: var(--secondary);
+        background: #f0f9ff;
+    }
+
+    .vote-btn.downvoted {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: #fef2f2;
+    }
+
+    .vote-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Post Body Content */
+    .post-body {
+        padding: 2rem;
+        line-height: 1.8;
+        color: #2d3748;
+        font-size: 1.05rem;
+    }
+
+    .post-body p {
+        margin-bottom: 1.5rem;
+    }
+
+    .post-body h3 {
+        margin: 2rem 0 1rem 0;
+        font-size: 1.5rem;
+        color: #2d3748;
+    }
+
+    .post-body ul, .post-body ol {
+        margin-bottom: 1.5rem;
+        padding-left: 2rem;
+    }
+
+    .post-body li {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Media Attachments */
+    .post-attachments {
+        padding: 1.5rem 2rem;
+        background: #f8fafc;
+        border-top: 1px solid #eef2f5;
+    }
+
+    .attachment-title {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1rem;
+    }
+
+    .attachment-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .attachment-item {
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+        position: relative;
+    }
+
+    .attachment-item img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    .attachment-item a {
+        display: block;
+        text-decoration: none;
+        color: #2d3748;
+    }
+
+    /* Post Actions */
+    .post-actions {
+        padding: 1.5rem 2rem;
+        border-top: 1px solid #eef2f5;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        padding: 0.6rem 1.2rem;
+        border: 2px solid #eef2f5;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #2d3748;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .action-btn:hover {
+        border-color: var(--primary);
+        background: #f8fafc;
+    }
+
+    .action-btn.primary {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        border: none;
+    }
+
+    .action-btn.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .action-btn.danger {
+        background: #dc2626;
+        color: white;
+        border: none;
+    }
+
+    .action-btn.danger:hover {
+        background: #b91c1c;
+        transform: translateY(-2px);
+    }
+
+    .action-btn.bookmarked {
+        border-color: #fbbf24;
+        color: #f59e0b;
+        background: #fffbeb;
+    }
+
+    /* Comments Section */
+    .comments-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .comments-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #eef2f5;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .comments-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #2d3748;
+    }
+
+    .sort-select {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+    }
+
+    /* Comment Box */
+    .comment-box {
+        padding: 2rem;
+        border-bottom: 1px solid #eef2f5;
+        background: #f8fafc;
+    }
+
+    .comment-box.login-prompt {
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+
+    .comment-box.login-prompt p {
+        margin-bottom: 1rem;
+        color: #666;
+    }
+
+    .comment-box textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 1rem;
+        resize: vertical;
+        margin-bottom: 1rem;
+    }
+
+    .comment-box textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .comment-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+
+    /* Comment Item */
+    .comment-item {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #eef2f5;
+    }
+
+    .comment-item:last-child {
+        border-bottom: none;
+    }
+
+    .comment-header {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .comment-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .comment-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .comment-info {
+        flex: 1;
+    }
+
+    .comment-author {
+        font-weight: 600;
+        color: #2d3748;
+        margin-right: 0.5rem;
+        text-decoration: none;
+    }
+
+    .comment-author:hover {
+        color: var(--primary);
+    }
+
+    .comment-time {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .comment-body {
+        margin-left: 56px;
+        color: #2d3748;
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+
+    .comment-footer {
+        margin-left: 56px;
+        margin-top: 0.75rem;
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+    }
+
+    .comment-action {
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0;
+    }
+
+    .comment-action:hover {
+        color: var(--primary);
+    }
+
+    .comment-action.voted {
+        color: var(--secondary);
+        font-weight: 600;
+    }
+
+    /* Comment Replies */
+    .comment-replies {
+        margin-left: 56px;
+        margin-top: 1rem;
+        padding-left: 1.5rem;
+        border-left: 3px solid #e0e7ff;
+    }
+
+    .reply-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .reply-item:last-child {
+        border-bottom: none;
+    }
+
+    .reply-header {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .reply-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .reply-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .reply-info {
+        flex: 1;
+    }
+
+    .reply-author {
+        font-weight: 600;
+        color: #2d3748;
+        margin-right: 0.5rem;
+        font-size: 0.95rem;
+        text-decoration: none;
+    }
+
+    .reply-author:hover {
+        color: var(--primary);
+    }
+
+    .reply-time {
+        color: #666;
+        font-size: 0.85rem;
+    }
+
+    .reply-body {
+        margin-left: 40px;
+        color: #2d3748;
+        line-height: 1.6;
+        font-size: 0.95rem;
+        white-space: pre-wrap;
+    }
+
+    .reply-footer {
+        margin-left: 40px;
+        margin-top: 0.5rem;
+        display: flex;
+        gap: 1rem;
+    }
+
+    .reply-action {
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0;
+    }
+
+    .reply-action:hover {
+        color: var(--primary);
+    }
+
+    .reply-action.voted {
+        color: var(--secondary);
+        font-weight: 600;
+    }
+
+    /* Reply Form */
+    .reply-form {
+        margin-left: 56px;
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 8px;
+        display: none;
+    }
+
+    .reply-form.active {
+        display: block;
+    }
+
+    .reply-form textarea {
+        width: 100%;
+        min-height: 80px;
+        padding: 0.75rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.95rem;
+        resize: vertical;
+        margin-bottom: 0.75rem;
+    }
+
+    .reply-form textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .reply-form-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+    }
+
+    .reply-form-actions button {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .reply-form-actions .btn-submit {
+        background: var(--primary);
+        color: white;
+    }
+
+    .reply-form-actions .btn-cancel {
+        background: #e5e7eb;
+        color: #4b5563;
+    }
+
+    /* Report Modal */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .modal {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: slideUp 0.3s;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .modal h2 {
+        margin: 0 0 1.5rem 0;
+        color: #2d3748;
+        font-size: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 1rem;
+    }
+
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .form-group textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+
+    .modal-actions button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .modal-actions .btn-submit {
+        background: var(--primary);
+        color: white;
+    }
+
+    .modal-actions .btn-submit:hover {
+        background: var(--secondary);
+    }
+
+    .modal-actions .btn-cancel {
+        background: #e5e7eb;
+        color: #4b5563;
+    }
+
+    .modal-actions .btn-cancel:hover {
+        background: #d1d5db;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .post-detail-container {
+            padding: 1rem 0.5rem;
+        }
+
+        .post-header, .post-author-section, .post-body, .post-attachments, .post-actions {
+            padding: 1.5rem 1rem;
+        }
+
+        .post-main-title {
+            font-size: 1.5rem;
+        }
+
+        .post-author-section {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .post-stats {
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .comment-box {
+            padding: 1.5rem 1rem;
+        }
+
+        .comment-item {
+            padding: 1.5rem 1rem;
+        }
+
+        .comment-body, .comment-footer {
+            margin-left: 0;
+        }
+
+        .comment-replies {
+            margin-left: 0;
+            padding-left: 1rem;
+        }
+
+        .reply-body, .reply-footer {
+            margin-left: 0;
+        }
+
+        .reply-form {
+            margin-left: 0;
+        }
+
+        .modal {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<main>
+    <!-- Django Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }}">
+            <span>{{ message }}</span>
+            <button class="close-btn" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="post-detail-container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+            <a href="{% url 'forum:feed' %}">Forum</a>
+            <span>/</span>
+            <a href="{% url 'forum:category' slug=topic.category.slug %}">{{ topic.category.name }}</a>
+            <span>/</span>
+            <span>{{ topic.title|truncatewords:5 }}</span>
+        </nav>
+
+        <!-- Main Post -->
+        <article class="main-post">
+            <!-- Post Header -->
+            <div class="post-header">
+                <div class="post-badges">
+                    <a href="{% url 'forum:category' slug=topic.category.slug %}" class="category-badge">{{ topic.category.icon }} {{ topic.category.name }}</a>
+                    {% if topic.is_pinned %}
+                    <span class="pinned-badge">📌 Pinned</span>
+                    {% endif %}
+                    {% if topic.is_featured %}
+                    <span class="featured-badge">⭐ Featured</span>
+                    {% endif %}
+                    {% if topic.is_solved %}
+                    <span class="solved-badge">✓ Solved</span>
+                    {% endif %}
+                </div>
+
+                <h1 class="post-main-title">{{ topic.title }}</h1>
+
+                {% if topic.tags.exists %}
+                <div class="post-tags">
+                    {% for tag in topic.tags.all %}
+                    <a href="{% url 'forum:tag' slug=tag.slug %}" class="tag">{{ tag.name }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Author Section -->
+            <div class="post-author-section">
+                <div class="author-details">
+                    <div class="author-avatar">
+                        <img src="{{ topic.author.forum_profile.get_avatar_url }}" alt="{{ topic.author.username }}">
+                    </div>
+                    <div class="author-info-text">
+                        <h4><a href="{% url 'forum:user_profile' username=topic.author.username %}">{{ topic.author.forum_profile.get_display_name }}</a></h4>
+                        <p>Posted {{ topic.created_at|timesince }} ago</p>
+                    </div>
+                </div>
+
+                <div class="post-stats">
+                    <div class="stat-item">
+                        <i class="fa fa-eye"></i>
+                        <span>{{ topic.views }} views</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fa fa-comment"></i>
+                        <span id="reply-count">{{ reply_count }}</span> comments
+                    </div>
+                </div>
+
+                <div class="voting-section">
+                    <button class="vote-btn {% if user_upvoted %}upvoted{% endif %}" 
+                            data-vote-type="upvote" 
+                            data-topic-id="{{ topic.id }}"
+                            {% if not user.is_authenticated %}disabled title="Login to vote"{% endif %}>
+                        <i class="fa fa-arrow-up"></i>
+                        <span class="upvote-count">{{ topic.upvote_count }}</span>
+                    </button>
+                    <button class="vote-btn {% if user_downvoted %}downvoted{% endif %}" 
+                            data-vote-type="downvote" 
+                            data-topic-id="{{ topic.id }}"
+                            {% if not user.is_authenticated %}disabled title="Login to vote"{% endif %}>
+                        <i class="fa fa-arrow-down"></i>
+                        <span class="downvote-count">{{ topic.downvote_count }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Post Body -->
+            <div class="post-body">
+                {{ topic.content|linebreaks }}
+            </div>
+
+            <!-- Attachments -->
+            {% if topic.attachments.exists %}
+            <div class="post-attachments">
+                <div class="attachment-title">📎 Attachments ({{ topic.attachments.count }})</div>
+                <div class="attachment-grid">
+                    {% for attachment in topic.attachments.all %}
+                    <div class="attachment-item">
+                        {% if attachment.file_type == 'image' %}
+                        <a href="{{ attachment.file.url }}" target="_blank">
+                            <img src="{{ attachment.file.url }}" alt="{{ attachment.file_name }}">
+                        </a>
+                        {% else %}
+                        <a href="{{ attachment.file.url }}" target="_blank" style="display: flex; align-items: center; justify-content: center; height: 150px; background: #f8fafc;">
+                            <div style="text-align: center;">
+                                <i class="fa fa-file" style="font-size: 3rem; color: var(--primary);"></i>
+                                <p style="margin-top: 0.5rem; font-size: 0.9rem;">{{ attachment.file_name }}</p>
+                            </div>
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Post Actions -->
+            <div class="post-actions">
+                {% if user.is_authenticated %}
+                <button class="action-btn {% if user_bookmarked %}bookmarked{% endif %}" 
+                        id="bookmark-btn" 
+                        data-topic-id="{{ topic.id }}">
+                    <i class="fa fa-bookmark"></i>
+                    <span>{% if user_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}</span>
+                </button>
+                <button class="action-btn" onclick="shareToTwitter()">
+                    <i class="fa fa-share"></i>
+                    Share
+                </button>
+                {% if user == topic.author %}
+                <a href="{% url 'forum:edit_topic' topic_id=topic.id %}" class="action-btn">
+                    <i class="fa fa-edit"></i>
+                    Edit Topic
+                </a>
+                <button class="action-btn danger" id="delete-topic-btn" data-topic-id="{{ topic.id }}">
+                    <i class="fa fa-trash"></i>
+                    Delete Topic
+                </button>
+                {% endif %}
+                <button class="action-btn" onclick="openReportModal('topic', `{{ topic.id }}`)">
+                    <i class="fa fa-flag"></i>
+                    Report
+                </button>
+                {% else %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="action-btn">
+                    <i class="fa fa-bookmark"></i>
+                    Login to Bookmark
+                </a>
+                {% endif %}
+            </div>
+        </article>
+
+        <!-- Comments Section -->
+        <section class="comments-section">
+            <div class="comments-header">
+                <h3><span id="reply-count-header">{{ reply_count }}</span> Comments</h3>
+                <select class="sort-select" id="sort-comments">
+                    <option value="oldest" {% if sort_comments == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    <option value="newest" {% if sort_comments == 'newest' %}selected{% endif %}>Newest First</option>
+                    <option value="popular" {% if sort_comments == 'popular' %}selected{% endif %}>Most Popular</option>
+                </select>
+            </div>
+
+            <!-- Comment Box -->
+            {% if user.is_authenticated %}
+            <div class="comment-box" id="main-comment-box">
+                <form id="comment-form">
+                    {% csrf_token %}
+                    <textarea name="content" placeholder="Write your comment..." required></textarea>
+                    <div class="comment-actions">
+                        <button type="submit" class="action-btn primary">Post Comment</button>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <div class="comment-box login-prompt">
+                <p>Please <a href="{% url 'login' %}?next={{ request.path }}">login</a> to join the discussion.</p>
+            </div>
+            {% endif %}
+
+            <!-- Comments List -->
+            <div class="comments-list" id="comments-list">
+                {% for reply in replies %}
+                {% include 'forum/partials/reply_item.html' with reply=reply %}
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <!-- Report Modal -->
+    <div class="modal-overlay" id="report-modal">
+        <div class="modal">
+            <h2>Report Content</h2>
+            <form id="report-form" action="{% url 'forum:report_content' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" id="report-content-type" name="content_type">
+                <input type="hidden" id="report-content-id" name="content_id">
+                
+                <div class="form-group">
+                    <label for="report-type">Report Type</label>
+                    <select id="report-type" name="report_type" required>
+                        <option value="">Select a reason</option>
+                        <option value="spam">Spam</option>
+                        <option value="harassment">Harassment</option>
+                        <option value="inappropriate">Inappropriate Content</option>
+                        <option value="off_topic">Off Topic</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="report-description">Description</label>
+                    <textarea id="report-description" name="description" placeholder="Please provide details about why you're reporting this content..." required></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeReportModal()">Cancel</button>
+                    <button type="submit" class="btn-submit">Submit Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+const csrfToken = '{{ csrf_token }}';
+const topicSlug = '{{ topic.slug }}';
+const isAuthenticated = `{{ user.is_authenticated|yesno:"true,false" }}`;
+
+// Auto-hide messages after 5 seconds
+document.querySelectorAll('.alert').forEach(alert => {
+    setTimeout(() => {
+        alert.style.transition = 'opacity 0.5s';
+        alert.style.opacity = '0';
+        setTimeout(() => alert.remove(), 500);
+    }, 5000);
+});
+
+// Topic voting
+document.querySelectorAll('.post-author-section .vote-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        if (!isAuthenticated) {
+            window.location.href = "{% url 'login' %}?next={{ request.path }}";
+            return;
+        }
+
+        const voteType = this.dataset.voteType;
+        const topicId = this.dataset.topicId;
+
+        try {
+            const response = await fetch(`/forum/topic/${topicId}/vote/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken
+                },
+                body: `vote_type=${voteType}`
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update counts
+                document.querySelector('.upvote-count').textContent = data.upvote_count;
+                document.querySelector('.downvote-count').textContent = data.downvote_count;
+                
+                // Update button states
+                const upvoteBtn = document.querySelector('[data-vote-type="upvote"]');
+                const downvoteBtn = document.querySelector('[data-vote-type="downvote"]');
+                
+                upvoteBtn.classList.remove('upvoted');
+                downvoteBtn.classList.remove('downvoted');
+                
+                if (data.action === 'added_upvote') {
+                    upvoteBtn.classList.add('upvoted');
+                } else if (data.action === 'added_downvote') {
+                    downvoteBtn.classList.add('downvoted');
+                }
+            }
+        } catch (error) {
+            console.error('Error voting:', error);
+            showMessage('Failed to vote. Please try again.', 'error');
+        }
+    });
+});
+
+// Bookmark toggle
+const bookmarkBtn = document.getElementById('bookmark-btn');
+if (bookmarkBtn) {
+    bookmarkBtn.addEventListener('click', async function() {
+        const topicId = this.dataset.topicId;
+        
+        try {
+            const response = await fetch(`/forum/topic/${topicId}/bookmark/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                if (data.action === 'added') {
+                    this.classList.add('bookmarked');
+                    this.querySelector('span').textContent = 'Bookmarked';
+                    showMessage('Topic bookmarked successfully!', 'success');
+                } else {
+                    this.classList.remove('bookmarked');
+                    this.querySelector('span').textContent = 'Bookmark';
+                    showMessage('Bookmark removed.', 'info');
+                }
+            }
+        } catch (error) {
+            console.error('Error bookmarking:', error);
+            showMessage('Failed to bookmark. Please try again.', 'error');
+        }
+    });
+}
+
+// Delete topic
+const deleteBtn = document.getElementById('delete-topic-btn');
+if (deleteBtn) {
+    deleteBtn.addEventListener('click', async function() {
+        if (!confirm('Are you sure you want to delete this topic? This action cannot be undone.')) {
+            return;
+        }
+        
+        const topicId = this.dataset.topicId;
+        
+        try {
+            const response = await fetch(`/forum/topic/${topicId}/delete/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                window.location.href = "{% url 'forum:feed' %}";
+            } else {
+                showMessage(data.error || 'Failed to delete topic', 'error');
+            }
+        } catch (error) {
+            console.error('Error deleting topic:', error);
+            showMessage('Failed to delete topic. Please try again.', 'error');
+        }
+    });
+}
+
+// Comment form submission
+const commentForm = document.getElementById('comment-form');
+if (commentForm) {
+    commentForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const content = formData.get('content').trim();
+        
+        if (!content) {
+            showMessage('Please enter a comment.', 'error');
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/forum/topic/${topicSlug}/reply/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                showMessage('Comment posted successfully!', 'success');
+                // Reload after a short delay to show the message
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showMessage(data.error || 'Failed to post comment', 'error');
+            }
+        } catch (error) {
+            console.error('Error posting comment:', error);
+            showMessage('Failed to post comment. Please try again.', 'error');
+        }
+    });
+}
+
+// Reply button handlers
+document.addEventListener('click', function(e) {
+    // Handle reply button clicks
+    if (e.target.closest('.comment-action[data-action="reply"]') || 
+        e.target.closest('.reply-action[data-action="reply"]')) {
+        if (!isAuthenticated) {
+            window.location.href = "{% url 'login' %}?next={{ request.path }}";
+            return;
+        }
+        
+        const btn = e.target.closest('.comment-action, .reply-action');
+        const commentItem = btn.closest('.comment-item, .reply-item');
+        const replyForm = commentItem.querySelector('.reply-form');
+        
+        if (replyForm) {
+            replyForm.classList.toggle('active');
+            if (replyForm.classList.contains('active')) {
+                replyForm.querySelector('textarea').focus();
+            }
+        }
+    }
+    
+    // Handle reply form cancel
+    if (e.target.classList.contains('btn-cancel')) {
+        const replyForm = e.target.closest('.reply-form');
+        if (replyForm) {
+            replyForm.classList.remove('active');
+            const textarea = replyForm.querySelector('textarea');
+            if (textarea) textarea.value = '';
+        }
+    }
+    
+    // Handle reply form submit
+    if (e.target.classList.contains('btn-submit')) {
+        e.preventDefault();
+        const form = e.target.closest('.reply-form');
+        
+        if (!form) return;
+        
+        const textarea = form.querySelector('textarea');
+        if (!textarea) return;
+        
+        const content = textarea.value.trim();
+        
+        if (!content) {
+            showMessage('Please enter a reply.', 'error');
+            return;
+        }
+        
+        const parentId = form.dataset.parentId;
+        
+        const formData = new FormData();
+        formData.append('content', content);
+        formData.append('parent_id', parentId);
+        
+        fetch(`/forum/topic/${topicSlug}/reply/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage('Reply posted successfully!', 'success');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showMessage(data.error || 'Failed to post reply', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error posting reply:', error);
+            showMessage('Failed to post reply. Please try again.', 'error');
+        });
+    }
+});
+
+// Vote on comments/replies
+document.addEventListener('click', async function(e) {
+    const voteBtn = e.target.closest('.comment-action[data-action="vote"], .reply-action[data-action="vote"]');
+    
+    if (voteBtn) {
+        if (!isAuthenticated) {
+            window.location.href = "{% url 'login' %}?next={{ request.path }}";
+            return;
+        }
+        
+        const replyId = voteBtn.dataset.replyId;
+        const voteType = voteBtn.dataset.voteType;
+        
+        try {
+            const response = await fetch(`/forum/reply/${replyId}/vote/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken
+                },
+                body: `vote_type=${voteType}`
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update vote count display
+                voteBtn.innerHTML = `<i class="fa fa-thumbs-up"></i> ${data.upvote_count}`;
+                
+                // Toggle voted class
+                if (data.action === 'added_upvote') {
+                    voteBtn.classList.add('voted');
+                } else {
+                    voteBtn.classList.remove('voted');
+                }
+            }
+        } catch (error) {
+            console.error('Error voting on reply:', error);
+            showMessage('Failed to vote. Please try again.', 'error');
+        }
+    }
+});
+
+// Comment sorting
+const sortSelect = document.getElementById('sort-comments');
+if (sortSelect) {
+    sortSelect.addEventListener('change', function() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('sort_comments', this.value);
+        window.location.href = url.toString();
+    });
+}
+
+// Share to Twitter
+function shareToTwitter() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent('{{ topic.title|escapejs }}');
+    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank', 'width=600,height=400');
+}
+
+// Report Modal Functions
+function openReportModal(contentType, contentId) {
+    if (!isAuthenticated) {
+        window.location.href = "{% url 'login' %}?next={{ request.path }}";
+        return;
+    }
+    
+    document.getElementById('report-content-type').value = contentType;
+    document.getElementById('report-content-id').value = contentId;
+    document.getElementById('report-modal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeReportModal() {
+    document.getElementById('report-modal').classList.remove('active');
+    document.getElementById('report-form').reset();
+    document.body.style.overflow = '';
+}
+
+// Close modal on overlay click
+document.getElementById('report-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeReportModal();
+    }
+});
+
+// Report form submission
+document.getElementById('report-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('.btn-submit');
+    const originalText = submitBtn.textContent;
+    
+    // Validate description length
+    const description = formData.get('description').trim();
+    if (description.length < 10) {
+        showMessage('Description must be at least 10 characters.', 'error');
+        return;
+    }
+    
+    // Disable submit button
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+    
+    try {
+        const response = await fetch('/forum/report/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            closeReportModal();
+            showMessage(data.message || 'Thank you for your report. Our moderators will review it.', 'success');
+        } else {
+            showMessage(data.error || 'Failed to submit report', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    } catch (error) {
+        console.error('Error submitting report:', error);
+        showMessage('Failed to submit report. Please try again.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
+});
+
+// Helper function to show messages
+function showMessage(text, type) {
+    const messagesContainer = document.querySelector('.messages') || createMessagesContainer();
+    
+    const alert = document.createElement('div');
+    alert.className = `alert ${type}`;
+    alert.innerHTML = `
+        <span>${text}</span>
+        <button class="close-btn" onclick="this.parentElement.remove()">&times;</button>
+    `;
+    
+    messagesContainer.appendChild(alert);
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+        alert.style.transition = 'opacity 0.5s';
+        alert.style.opacity = '0';
+        setTimeout(() => alert.remove(), 500);
+    }, 5000);
+}
+
+function createMessagesContainer() {
+    const container = document.createElement('div');
+    container.className = 'messages';
+    document.querySelector('main').insertBefore(container, document.querySelector('main').firstChild);
+    return container;
+}
+
+// ESC key to close modal
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('report-modal').classList.contains('active')) {
+        closeReportModal();
+    }
+});
+</script>
+{% endblock %}

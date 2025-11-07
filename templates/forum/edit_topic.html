@@ -1,0 +1,839 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+Edit Topic - {{ topic.title }} - MatSci Hub Forum
+{% endblock %}
+
+{% block meta_links %}
+<style>
+    .edit-topic-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+        color: #666;
+        font-size: 1rem;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .form-group label .required {
+        color: #dc2626;
+        margin-left: 0.25rem;
+    }
+
+    .form-group .help-text {
+        display: block;
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 0.25rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .form-input.error {
+        border-color: #dc2626;
+    }
+
+    textarea.form-input {
+        min-height: 200px;
+        resize: vertical;
+    }
+
+    .error-message {
+        color: #dc2626;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        display: none;
+    }
+
+    .error-message.show {
+        display: block;
+    }
+
+    /* Tag Input */
+    .tag-input-wrapper {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 0.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        min-height: 45px;
+        transition: border-color 0.3s;
+    }
+
+    .tag-input-wrapper:focus-within {
+        border-color: var(--primary);
+    }
+
+    .tag-input-wrapper.error {
+        border-color: #dc2626;
+    }
+
+    .tag-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #e0e7ff;
+        color: #3730a3;
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .tag-item .remove-tag {
+        cursor: pointer;
+        color: #3730a3;
+        font-weight: bold;
+        font-size: 1.1rem;
+        line-height: 1;
+    }
+
+    .tag-item .remove-tag:hover {
+        color: #1e1b4b;
+    }
+
+    .tag-input {
+        border: none;
+        outline: none;
+        flex: 1;
+        min-width: 120px;
+        padding: 0.25rem;
+        font-family: inherit;
+        font-size: 0.95rem;
+    }
+
+    /* Existing Attachments */
+    .existing-attachments {
+        margin-bottom: 1rem;
+    }
+
+    .existing-attachments h4 {
+        font-size: 0.95rem;
+        color: #2d3748;
+        margin-bottom: 0.75rem;
+    }
+
+    .attachment-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        background: #f8fafc;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+        margin-bottom: 0.5rem;
+    }
+
+    .attachment-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1;
+    }
+
+    .attachment-info i {
+        font-size: 1.5rem;
+        color: var(--primary);
+    }
+
+    .attachment-info .attachment-name {
+        font-weight: 600;
+        color: #2d3748;
+    }
+
+    .remove-attachment {
+        background: #fee2e2;
+        color: #dc2626;
+        border: none;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .remove-attachment:hover {
+        background: #fecaca;
+    }
+
+    /* File Upload */
+    .file-upload-area {
+        border: 2px dashed #e0e0e0;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .file-upload-area:hover {
+        border-color: var(--primary);
+        background: #f8fafc;
+    }
+
+    .file-upload-area.dragover {
+        border-color: var(--primary);
+        background: #f0f9ff;
+    }
+
+    .file-upload-area i {
+        font-size: 3rem;
+        color: #cbd5e0;
+        margin-bottom: 1rem;
+    }
+
+    .file-upload-area p {
+        color: #666;
+        margin: 0.5rem 0;
+    }
+
+    .file-upload-area .btn-browse {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        background: var(--primary);
+        color: white;
+        border-radius: 6px;
+        margin-top: 1rem;
+        font-weight: 600;
+    }
+
+    #file-input {
+        display: none;
+    }
+
+    .file-list {
+        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .file-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        background: #f8fafc;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .file-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1;
+    }
+
+    .file-info i {
+        font-size: 1.5rem;
+        color: var(--primary);
+    }
+
+    .file-info .file-details {
+        flex: 1;
+    }
+
+    .file-info .file-name {
+        font-weight: 600;
+        color: #2d3748;
+        display: block;
+    }
+
+    .file-info .file-size {
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+    .remove-file {
+        background: #fee2e2;
+        color: #dc2626;
+        border: none;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .remove-file:hover {
+        background: #fecaca;
+    }
+
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .btn {
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #4b5563;
+    }
+
+    .btn-secondary:hover {
+        background: #d1d5db;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .edit-topic-container {
+            margin: 1rem auto;
+        }
+
+        .form-card {
+            padding: 1.5rem 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<main>
+    <div class="edit-topic-container">
+        <div class="page-header">
+            <h1>Edit Topic</h1>
+            <p>Update your topic details</p>
+        </div>
+
+        <div class="form-card">
+            <form id="edit-topic-form" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Title -->
+                <div class="form-group">
+                    <label for="title">
+                        Title
+                        <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="title" 
+                        name="title" 
+                        class="form-input" 
+                        placeholder="Enter a descriptive title for your topic"
+                        maxlength="255"
+                        value="{{ topic.title }}"
+                        required>
+                    <span class="error-message" id="title-error"></span>
+                </div>
+
+                <!-- Category -->
+                <div class="form-group">
+                    <label for="category">
+                        Category
+                        <span class="required">*</span>
+                    </label>
+                    <select id="category" name="category" class="form-input" required>
+                        <option value="">Select a category</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if category.id == topic.category.id %}selected{% endif %}>
+                            {{ category.icon }} {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <span class="error-message" id="category-error"></span>
+                </div>
+
+                <!-- Content -->
+                <div class="form-group">
+                    <label for="content">
+                        Content
+                        <span class="required">*</span>
+                    </label>
+                    <textarea 
+                        id="content" 
+                        name="content" 
+                        class="form-input" 
+                        placeholder="Write your topic content here..."
+                        required>{{ topic.content }}</textarea>
+                    <span class="help-text">Minimum 10 characters required</span>
+                    <span class="error-message" id="content-error"></span>
+                </div>
+
+                <!-- Tags -->
+                <div class="form-group">
+                    <label for="tag-input">
+                        Tags
+                        <span style="color: #666; font-weight: normal;">(Optional)</span>
+                    </label>
+                    <div class="tag-input-wrapper" id="tag-wrapper">
+                        <input 
+                            type="text" 
+                            id="tag-input" 
+                            class="tag-input" 
+                            placeholder="Type a tag and press Enter">
+                    </div>
+                    <span class="help-text">Add tags to help others find your topic. Press Enter after each tag.</span>
+                    <span class="error-message" id="tags-error"></span>
+                </div>
+
+                <!-- Existing Attachments -->
+                {% if topic.attachments.exists %}
+                <div class="form-group">
+                    <label>Existing Attachments</label>
+                    <div class="existing-attachments" id="existing-attachments">
+                        {% for attachment in topic.attachments.all %}
+                        <div class="attachment-item" data-attachment-id="{{ attachment.id }}">
+                            <div class="attachment-info">
+                                <i class="fa fa-file"></i>
+                                <span class="attachment-name">{{ attachment.file_name }}</span>
+                            </div>
+                            <button type="button" class="remove-attachment" data-attachment-id="{{ attachment.id }}">
+                                <i class="fa fa-trash"></i> Remove
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- File Attachments -->
+                <div class="form-group">
+                    <label>
+                        Add New Attachments
+                        <span style="color: #666; font-weight: normal;">(Optional)</span>
+                    </label>
+                    <div class="file-upload-area" id="file-upload-area">
+                        <i class="fa fa-cloud-upload"></i>
+                        <p><strong>Drag and drop files here</strong></p>
+                        <p>or</p>
+                        <span class="btn-browse">Browse Files</span>
+                        <p style="margin-top: 1rem; font-size: 0.85rem;">Supports images, documents, and videos (Max 5MB each)</p>
+                    </div>
+                    <input type="file" id="file-input" name="attachments" multiple accept="image/*,.pdf,.doc,.docx,.txt,.xls,.xlsx">
+                    <div class="file-list" id="file-list"></div>
+                    <span class="error-message" id="files-error"></span>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="submit-btn">
+                        <i class="fa fa-save"></i>
+                        Save Changes
+                    </button>
+                    <a href="{% url 'forum:topic_detail' slug=topic.slug %}" class="btn btn-secondary">
+                        <i class="fa fa-times"></i>
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+const csrfToken = '{{ csrf_token }}';
+const topicId = '{{ topic.id }}';
+const tags = '{{ existing_tags|safe }}';
+const removedAttachments = [];
+const uploadedFiles = [];
+
+// Form elements
+const form = document.getElementById('edit-topic-form');
+const titleInput = document.getElementById('title');
+const categorySelect = document.getElementById('category');
+const contentTextarea = document.getElementById('content');
+const tagInput = document.getElementById('tag-input');
+const tagWrapper = document.getElementById('tag-wrapper');
+const fileInput = document.getElementById('file-input');
+const fileUploadArea = document.getElementById('file-upload-area');
+const fileList = document.getElementById('file-list');
+const submitBtn = document.getElementById('submit-btn');
+
+// Initialize existing tags
+tags.forEach(tag => addTagElement(tag));
+
+// Validation functions
+function validateTitle() {
+    const value = titleInput.value.trim();
+    const errorEl = document.getElementById('title-error');
+    
+    if (!value) {
+        showError(titleInput, errorEl, 'Title is required');
+        return false;
+    }
+    
+    if (value.length < 5) {
+        showError(titleInput, errorEl, 'Title must be at least 5 characters');
+        return false;
+    }
+    
+    if (value.length > 255) {
+        showError(titleInput, errorEl, 'Title must not exceed 255 characters');
+        return false;
+    }
+    
+    clearError(titleInput, errorEl);
+    return true;
+}
+
+function validateCategory() {
+    const value = categorySelect.value;
+    const errorEl = document.getElementById('category-error');
+    
+    if (!value) {
+        showError(categorySelect, errorEl, 'Please select a category');
+        return false;
+    }
+    
+    clearError(categorySelect, errorEl);
+    return true;
+}
+
+function validateContent() {
+    const value = contentTextarea.value.trim();
+    const errorEl = document.getElementById('content-error');
+    
+    if (!value) {
+        showError(contentTextarea, errorEl, 'Content is required');
+        return false;
+    }
+    
+    if (value.length < 10) {
+        showError(contentTextarea, errorEl, 'Content must be at least 10 characters');
+        return false;
+    }
+    
+    clearError(contentTextarea, errorEl);
+    return true;
+}
+
+function showError(input, errorEl, message) {
+    input.classList.add('error');
+    errorEl.textContent = message;
+    errorEl.classList.add('show');
+}
+
+function clearError(input, errorEl) {
+    input.classList.remove('error');
+    errorEl.classList.remove('show');
+}
+
+// Input validation on blur
+titleInput.addEventListener('blur', validateTitle);
+categorySelect.addEventListener('change', validateCategory);
+contentTextarea.addEventListener('blur', validateContent);
+
+// Tag management
+tagInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        const value = this.value.trim().toLowerCase();
+        
+        if (value && !tags.includes(value)) {
+            if (tags.length >= 10) {
+                alert('Maximum 10 tags allowed');
+                return;
+            }
+            
+            tags.push(value);
+            addTagElement(value);
+            this.value = '';
+        }
+    }
+});
+
+function addTagElement(tag) {
+    const tagEl = document.createElement('span');
+    tagEl.className = 'tag-item';
+    tagEl.innerHTML = `
+        ${tag}
+        <span class="remove-tag" data-tag="${tag}">&times;</span>
+    `;
+    tagWrapper.insertBefore(tagEl, tagInput);
+}
+
+tagWrapper.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-tag')) {
+        const tag = e.target.dataset.tag;
+        const index = tags.indexOf(tag);
+        if (index > -1) {
+            tags.splice(index, 1);
+        }
+        e.target.parentElement.remove();
+    }
+});
+
+// Remove existing attachments
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.remove-attachment')) {
+        const btn = e.target.closest('.remove-attachment');
+        const attachmentId = btn.dataset.attachmentId;
+        const attachmentItem = btn.closest('.attachment-item');
+        
+        if (confirm('Are you sure you want to remove this attachment?')) {
+            removedAttachments.push(attachmentId);
+            attachmentItem.remove();
+        }
+    }
+});
+
+// File upload handling
+fileUploadArea.addEventListener('click', () => fileInput.click());
+
+fileInput.addEventListener('change', function(e) {
+    handleFiles(Array.from(this.files));
+});
+
+// Drag and drop
+fileUploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.classList.add('dragover');
+});
+
+fileUploadArea.addEventListener('dragleave', function() {
+    this.classList.remove('dragover');
+});
+
+fileUploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+    handleFiles(Array.from(e.dataTransfer.files));
+});
+
+function handleFiles(files) {
+    const errorEl = document.getElementById('files-error');
+    clearError(fileUploadArea, errorEl);
+    
+    for (const file of files) {
+        // Validate file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+            showError(fileUploadArea, errorEl, `${file.name} is too large. Maximum size is 5MB.`);
+            continue;
+        }
+        
+        // Check if file already added
+        if (uploadedFiles.find(f => f.name === file.name)) {
+            continue;
+        }
+        
+        uploadedFiles.push(file);
+        addFileElement(file);
+    }
+}
+
+function addFileElement(file) {
+    const fileItem = document.createElement('div');
+    fileItem.className = 'file-item';
+    fileItem.dataset.fileName = file.name;
+    
+    const icon = getFileIcon(file.name);
+    const size = formatFileSize(file.size);
+    
+    fileItem.innerHTML = `
+        <div class="file-info">
+            <i class="fa ${icon}"></i>
+            <div class="file-details">
+                <span class="file-name">${file.name}</span>
+                <span class="file-size">${size}</span>
+            </div>
+        </div>
+        <button type="button" class="remove-file" data-file="${file.name}">
+            <i class="fa fa-trash"></i> Remove
+        </button>
+    `;
+    
+    fileList.appendChild(fileItem);
+}
+
+fileList.addEventListener('click', function(e) {
+    if (e.target.closest('.remove-file')) {
+        const fileName = e.target.closest('.remove-file').dataset.file;
+        const index = uploadedFiles.findIndex(f => f.name === fileName);
+        
+        if (index > -1) {
+            uploadedFiles.splice(index, 1);
+        }
+        
+        document.querySelector(`[data-file-name="${fileName}"]`).remove();
+    }
+});
+
+function getFileIcon(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
+        return 'fa-file-image';
+    } else if (['pdf'].includes(ext)) {
+        return 'fa-file-pdf';
+    } else if (['doc', 'docx'].includes(ext)) {
+        return 'fa-file-word';
+    } else if (['xls', 'xlsx'].includes(ext)) {
+        return 'fa-file-excel';
+    }
+    return 'fa-file';
+}
+
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
+// Form submission
+form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Validate all fields
+    const isTitleValid = validateTitle();
+    const isCategoryValid = validateCategory();
+    const isContentValid = validateContent();
+    
+    if (!isTitleValid || !isCategoryValid || !isContentValid) {
+        alert('Please fix the errors before submitting');
+        return;
+    }
+    
+    // Disable submit button
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="loading-spinner"></span> Saving Changes...';
+    
+    // Create FormData
+    const formData = new FormData();
+    formData.append('title', titleInput.value.trim());
+    formData.append('category', categorySelect.value);
+    formData.append('content', contentTextarea.value.trim());
+    formData.append('tags', JSON.stringify(tags));
+    formData.append('removed_attachments', JSON.stringify(removedAttachments));
+    
+    // Add new files
+    uploadedFiles.forEach(file => {
+        formData.append('attachments', file);
+    });
+    
+    try {
+        const response = await fetch(`/forum/topic/${topicId}/edit/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            window.location.href = data.redirect_url;
+        } else {
+            alert(data.error || 'Failed to update topic. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa fa-save"></i> Save Changes';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa fa-save"></i> Save Changes';
+    }
+});
+</script>
+{% endblock %}

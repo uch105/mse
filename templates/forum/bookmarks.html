@@ -1,0 +1,375 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+My Bookmarks - MatSci Hub Forum
+{% endblock %}
+
+{% block meta_links %}
+<style>
+    .bookmarks-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+        color: #666;
+        font-size: 1rem;
+    }
+
+    /* Bookmarks Grid */
+    .bookmarks-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .bookmark-item {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        padding: 1.5rem;
+        border-radius: 10px;
+        background: #ffffff;
+        border: 1px solid #eef2f5;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        position: relative;
+    }
+
+    .bookmark-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(16,24,40,0.06);
+    }
+
+    .bookmark-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        display: grid;
+        place-items: center;
+        color: white;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .bookmark-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .bookmark-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .bookmark-title a {
+        color: #2d3748;
+        text-decoration: none;
+    }
+
+    .bookmark-title a:hover {
+        color: var(--primary);
+    }
+
+    .bookmark-meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .category-badge {
+        display: inline-block;
+        padding: 0.25rem 0.6rem;
+        background: #e0e7ff;
+        color: #3730a3;
+        border-radius: 6px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .bookmark-tags {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .tag {
+        display: inline-block;
+        padding: 0.25rem 0.6rem;
+        background: #f3f4f6;
+        color: #4b5563;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        text-decoration: none;
+    }
+
+    .bookmark-excerpt {
+        color: #4b5563;
+        line-height: 1.6;
+        margin: 0.75rem 0;
+    }
+
+    .bookmark-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eef2f5;
+    }
+
+    .bookmark-stats {
+        display: flex;
+        gap: 1.5rem;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .remove-bookmark-btn {
+        background: #fee2e2;
+        color: #dc2626;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .remove-bookmark-btn:hover {
+        background: #fecaca;
+        transform: scale(1.05);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        color: #e0e0e0;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state h2 {
+        color: #2d3748;
+        margin-bottom: 0.75rem;
+    }
+
+    .empty-state p {
+        color: #666;
+        margin-bottom: 2rem;
+    }
+
+    .empty-state .btn {
+        display: inline-block;
+        padding: 0.75rem 2rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.3s;
+    }
+
+    .empty-state .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+    }
+
+    .pagination a, .pagination span {
+        padding: 0.5rem 1rem;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #2d3748;
+    }
+
+    .pagination a:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .pagination .current {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .bookmark-item {
+            flex-direction: column;
+        }
+
+        .bookmark-footer {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .bookmark-stats {
+            flex-wrap: wrap;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<main>
+    <div class="bookmarks-container">
+        <div class="page-header">
+            <h1>📚 My Bookmarks</h1>
+            <p>Topics you've saved for later</p>
+        </div>
+
+        {% if bookmarks %}
+        <div class="bookmarks-grid">
+            {% for bookmark in bookmarks %}
+            <div class="bookmark-item" data-bookmark-id="{{ bookmark.id }}">
+                <div class="bookmark-icon">
+                    {% if bookmark.topic.is_pinned %}📌
+                    {% elif bookmark.topic.is_featured %}⭐
+                    {% elif bookmark.topic.is_solved %}✓
+                    {% else %}💬{% endif %}
+                </div>
+                <div class="bookmark-content">
+                    <h3 class="bookmark-title">
+                        <a href="{% url 'forum:topic_detail' slug=bookmark.topic.slug %}">{{ bookmark.topic.title }}</a>
+                    </h3>
+                    <div class="bookmark-meta">
+                        <a href="{% url 'forum:category' slug=bookmark.topic.category.slug %}" class="category-badge">
+                            {{ bookmark.topic.category.icon }} {{ bookmark.topic.category.name }}
+                        </a>
+                        <span>by {{ bookmark.topic.author.forum_profile.get_display_name }}</span>
+                        <span>• {{ bookmark.topic.created_at|timesince }} ago</span>
+                    </div>
+                    {% if bookmark.topic.tags.exists %}
+                    <div class="bookmark-tags">
+                        {% for tag in bookmark.topic.tags.all|slice:":5" %}
+                        <a href="{% url 'forum:tag' slug=tag.slug %}" class="tag">{{ tag.name }}</a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <p class="bookmark-excerpt">{{ bookmark.topic.get_excerpt }}</p>
+                    <div class="bookmark-footer">
+                        <div class="bookmark-stats">
+                            <span><i class="fa fa-eye"></i> {{ bookmark.topic.views }} views</span>
+                            <span><i class="fa fa-comment"></i> {{ bookmark.topic.reply_count }} comments</span>
+                            <span><i class="fa fa-arrow-up"></i> {{ bookmark.topic.upvote_count }} upvotes</span>
+                        </div>
+                        <button class="remove-bookmark-btn" data-topic-id="{{ bookmark.topic.id }}">
+                            <i class="fa fa-bookmark"></i> Remove Bookmark
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if bookmarks.has_other_pages %}
+        <div class="pagination">
+            {% if bookmarks.has_previous %}
+            <a href="?page={{ bookmarks.previous_page_number }}">&laquo; Previous</a>
+            {% endif %}
+            
+            <span class="current">Page {{ bookmarks.number }} of {{ bookmarks.paginator.num_pages }}</span>
+            
+            {% if bookmarks.has_next %}
+            <a href="?page={{ bookmarks.next_page_number }}">Next &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="empty-state">
+            <i class="fa fa-bookmark-o"></i>
+            <h2>No Bookmarks Yet</h2>
+            <p>Start bookmarking topics to easily find them later!</p>
+            <a href="{% url 'forum:feed' %}" class="btn">
+                <i class="fa fa-search"></i> Browse Topics
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+const csrfToken = '{{ csrf_token }}';
+
+// Remove bookmark
+document.addEventListener('click', async function(e) {
+    if (e.target.closest('.remove-bookmark-btn')) {
+        const btn = e.target.closest('.remove-bookmark-btn');
+        const topicId = btn.dataset.topicId;
+        const bookmarkItem = btn.closest('.bookmark-item');
+        
+        if (!confirm('Remove this bookmark?')) return;
+        
+        try {
+            const response = await fetch(`/forum/topic/${topicId}/bookmark/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Fade out and remove
+                bookmarkItem.style.transition = 'opacity 0.3s, transform 0.3s';
+                bookmarkItem.style.opacity = '0';
+                bookmarkItem.style.transform = 'scale(0.95)';
+                
+                setTimeout(() => {
+                    bookmarkItem.remove();
+                    
+                    // Check if no bookmarks left
+                    if (document.querySelectorAll('.bookmark-item').length === 0) {
+                        location.reload();
+                    }
+                }, 300);
+            } else {
+                alert('Failed to remove bookmark');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to remove bookmark');
+        }
+    }
+});
+</script>
+{% endblock %}

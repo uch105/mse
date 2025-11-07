@@ -1,0 +1,60 @@
+{% load static %}
+{% for topic in topics %}
+<div class="post-item">
+    <div class="post-status">
+        <div class="status-icon">
+            {% if topic.is_pinned %}📌
+            {% elif topic.is_featured %}⭐
+            {% elif topic.is_solved %}✓
+            {% else %}💬{% endif %}
+        </div>
+        <div class="upvote">
+            <i class="fa fa-arrow-up {% if user.is_authenticated and user in topic.upvotes.all %}upvoted{% endif %}" aria-hidden="true"></i>
+            {{ topic.upvote_count }}
+        </div>
+        <div class="downvote">
+            <i class="fa fa-arrow-down {% if user.is_authenticated and user in topic.downvotes.all %}downvoted{% endif %}" aria-hidden="true"></i>
+            {{ topic.downvote_count }}
+        </div>
+    </div>
+    <div class="post-content">
+        <div class="post-meta">
+            <a href="{% url 'forum:category' slug=topic.category.slug %}" class="category-badge">
+                {{ topic.category.icon }} {{ topic.category.name }}
+            </a>
+            {% if topic.is_pinned %}
+            <span class="badge pinned">Pinned</span>
+            {% endif %}
+            {% if topic.is_featured %}
+            <span class="badge featured">Featured</span>
+            {% endif %}
+            {% if topic.is_solved %}
+            <span class="badge solved">Solved</span>
+            {% endif %}
+            {% for tag in topic.tags.all|slice:":4" %}
+            <a href="{% url 'forum:tag' slug=tag.slug %}" class="tag">{{ tag.name }}</a>
+            {% endfor %}
+        </div>
+        <h3 class="post-title">
+            <a href="{% url 'forum:topic_detail' slug=topic.slug %}">{{ topic.title }}</a>
+        </h3>
+        <p class="post-text">{{ topic.get_excerpt }}</p>
+        {% if topic.has_media_attachments %}
+        <p class="post-text"><i>** See details to view {{ topic.attachments.count }} media file{{ topic.attachments.count|pluralize }} **</i></p>
+        {% endif %}
+        <div class="topic-footer">
+            <div class="author-info">
+                <div class="avatar">
+                    <img src="{{ topic.author.forum_profile.get_avatar_url }}" alt="{{ topic.author.username }}">
+                </div>
+                <a href="{% url 'forum:user_profile' username=topic.author.username %}">{{ topic.author.forum_profile.get_display_name }}</a>
+                <span class="activity-time">{{ topic.created_at|timesince }} ago</span>
+            </div>
+            <div class="views-comments-count">
+                <span>{{ topic.views }} views</span>
+                <span>{{ topic.reply_count }} comment{{ topic.reply_count|pluralize }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}

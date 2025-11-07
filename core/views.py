@@ -18,8 +18,11 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+import requests
 from .models import *
 from .utils import send_email
+from decouple import config
+from django.contrib.auth import get_user_model
 
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
@@ -27,6 +30,8 @@ from django.contrib.auth.tokens import default_token_generator as token_generato
 from django.contrib.sites.shortcuts import get_current_site
 
 import markdown
+
+User = get_user_model()
 
 def markdown_to_html(text):
     return markdown.markdown(
@@ -49,21 +54,45 @@ def resources(request):
 # ========================================
 
 def login_view(request):
+    next_url = request.GET.get('next') or request.POST.get('next')
     if request.method == 'POST':
+        cf_token = request.POST.get('cf-turnstile-response')
+        if not cf_token:
+            messages.error(request, "Please complete the verification.")
+            return redirect('login')
+
+        response = requests.post(
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+            data={
+                'secret': config('MSE_LAB_CF_SECRET_KEY', ''),
+                'response': cf_token,
+                'remoteip': request.META.get('REMOTE_ADDR')
+            }
+        )
+
+        result = response.json()
+        if not result.get('success'):
+            messages.error(request, "Verification failed. Try again.")
+            return redirect('login')
+        
         email = request.POST.get('email')
         password = request.POST.get('password')
         user = authenticate(request, username=email.split('@')[0], password=password)
         if user is not None:
             if user.is_active:
                 login(request,user)
-                return redirect('dashboard')
+                return redirect(next_url or 'dashboard')
             else:
                 messages.error(request, 'Your account is inactive. Please check your email for the activation link.')
                 return redirect('login')
         else:
             messages.error(request, 'Invalid email or password.')
             return redirect('login')
-    context = {}
+    cf_site_key = config('MSE_LAB_CF_SITE_KEY', '')
+    context = {
+        'next': request.GET.get('next', ''),
+        'cf_site_key': cf_site_key,
+    }
     return render(request, 'core/login.html', context)
 
 def logout_view(request):
@@ -72,27 +101,45 @@ def logout_view(request):
 
 def register(request):
     if request.method == 'POST':
+        cf_token = request.POST.get('cf-turnstile-response')
+        if not cf_token:
+            messages.error(request, "Please complete the verification.")
+            return redirect('register')
+
+        response = requests.post(
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+            data={
+                'secret': config('MSE_LAB_CF_SECRET_KEY', ''),
+                'response': cf_token,
+                'remoteip': request.META.get('REMOTE_ADDR')
+            }
+        )
+
+        result = response.json()
+        if not result.get('success'):
+            messages.error(request, "Verification failed. Try again.")
+            return redirect('register')
+
         fname = request.POST.get('fname')
         lname = request.POST.get('lname')
         email = request.POST.get('email')
         password = request.POST.get('password')
         password2 = request.POST.get('password2')
-        
-        # Basic validation
+
         if password != password2:
             messages.error(request, 'Passwords do not match.')
             return redirect('register')
         if User.objects.filter(username=email.split('@')[0]).exists():
             messages.error(request, 'Email is already registered.')
             return redirect('register')
-        
-        # Create inactive user
+
         user = User.objects.create_user(username=email.split('@')[0], email=email, password=password, first_name=fname, last_name=lname, is_active=False)
         user.save()
         profile = Profile.objects.create(user=user)
         profile.save()
+        user_profile = UserProfile.objects.create(user=user)
+        user_profile.save()
 
-        # Generate a token for email verification
         current_site = get_current_site(request)
         token = token_generator.make_token(user)
         uid = urlsafe_base64_encode(str(user.pk).encode())
@@ -103,7 +150,6 @@ def register(request):
             'token': token,
         })
 
-        # Send verification email
         send_email(
             subject='Activate your account',
             to=[email],

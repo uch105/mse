@@ -1,0 +1,6 @@
+# SSH Manager Configuration
+# Format: username|ip|description|keyfile|port|use_password
+uch|103.125.255.129|uch:NUTSU Technologies Server|/home/uch/id_ed25519|22|0
+root|103.125.255.129|root:NUTSU Technologies Server|/home/uch/id_ed25519|22|0
+root|103.132.96.145|Kamrul Academy|/home/uch/id_ed25519|22|0
+uch|192.168.0.216|pi5 local|/home/uch/id_ed25519|22|0

@@ -1,0 +1,877 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+{{ blog.title }}
+{% endblock %}
+
+{% block meta_links %}
+<!-- Title and Description -->
+<meta name="description" content="{{ blog.meta_description }}">
+<meta name="keywords" content="{{ blog.meta_keywords }}">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:title" content="{{ blog.title }}">
+<meta property="og:description" content="{{ blog.meta_description }}">
+<meta property="og:image" content="{{ blog.featured_image.url if blog.featured_image else 'https://materialsscience.net/static/images/icon.jpg' }}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:type" content="website">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ blog.title }}">
+<meta name="twitter:description" content="{{ blog.meta_description }}">
+<meta name="twitter:image" content="{{ blog.featured_image.url if blog.featured_image else 'https://materialsscience.net/static/images/icon.jpg' }}">
+
+<!-- Canonical URL -->
+<link rel="canonical" href="https://materialsscience.net/">
+
+<style>
+.blog-detail {
+    padding: 40px 0;
+}
+
+.blog-header {
+    max-width: 900px;
+    margin: 0 auto 50px;
+    text-align: center;
+}
+
+.blog-breadcrumb {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 20px;
+}
+
+.blog-breadcrumb a {
+    color: var(--secondary);
+    transition: var(--transition);
+}
+
+.blog-breadcrumb a:hover {
+    color: var(--primary);
+}
+
+.blog-breadcrumb span {
+    margin: 0 10px;
+}
+
+.blog-title {
+    font-size: 3rem;
+    line-height: 1.2;
+    margin: 20px 0;
+    color: var(--light);
+}
+
+.blog-meta-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.author-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.author-avatar {
+    font-size: 2.5rem;
+    color: var(--secondary);
+}
+
+.author-avatar img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.author-details {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.author-details strong {
+    color: var(--light);
+    font-size: 1.1rem;
+}
+
+.author-details span {
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.blog-stats-header {
+    display: flex;
+    gap: 20px;
+    color: var(--gray);
+    font-size: 0.95rem;
+}
+
+.admin-controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn-sm {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(220, 53, 69, 0.3);
+}
+
+.blog-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 50px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.blog-featured-image {
+    margin-bottom: 50px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.blog-featured-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.blog-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 50px;
+}
+
+.blog-section {
+    margin: 40px 0;
+}
+
+.section-title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: var(--secondary);
+}
+
+.section-image {
+    margin: 30px 0;
+}
+
+.section-image img {
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.image-caption, .video-caption {
+    text-align: center;
+    color: var(--gray);
+    font-style: italic;
+    margin-top: 15px;
+}
+
+.section-video {
+    margin: 30px 0;
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 15px;
+}
+
+.section-video iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+}
+
+.section-quote {
+    font-size: 1.3rem;
+    padding: 30px;
+    margin: 30px 0;
+    background: rgba(26, 115, 232, 0.1);
+    border-left: 4px solid var(--primary);
+    border-radius: 10px;
+}
+
+.section-code {
+    margin: 30px 0;
+}
+
+.share-section {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 15px;
+    padding: 30px;
+    margin: 50px 0;
+}
+
+.share-section h3 {
+    margin-bottom: 20px;
+    color: var(--secondary);
+}
+
+.share-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.share-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.share-btn.facebook {
+    background: #1877f2;
+    color: white;
+}
+
+.share-btn.twitter {
+    background: #1da1f2;
+    color: white;
+}
+
+.share-btn.linkedin {
+    background: #0077b5;
+    color: white;
+}
+
+.share-btn.copy {
+    background: var(--gray);
+    color: white;
+}
+
+.share-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.comments-section {
+    margin-top: 60px;
+}
+
+.comments-title {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    color: var(--secondary);
+}
+
+.comment-form {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 40px;
+}
+
+.comment-form textarea {
+    width: 100%;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    color: var(--light);
+    font-size: 1rem;
+    resize: vertical;
+    margin-bottom: 15px;
+}
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.login-prompt {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.login-prompt a {
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.comment {
+    display: flex;
+    gap: 15px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.comment.reply {
+    margin-left: 50px;
+    margin-top: 15px;
+}
+
+.comment-avatar {
+    font-size: 2.5rem;
+    color: var(--secondary);
+}
+
+.comment-avatar img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.comment-content {
+    flex: 1;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.comment-header strong {
+    color: var(--light);
+    font-size: 1.05rem;
+}
+
+.comment-date {
+    color: var(--gray);
+    font-size: 0.85rem;
+}
+
+.comment-content p {
+    color: var(--light);
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.reply-btn {
+    background: none;
+    border: none;
+    color: var(--secondary);
+    font-weight: 600;
+    cursor: pointer;
+    padding: 5px 0;
+    transition: var(--transition);
+}
+
+.reply-btn:hover {
+    color: var(--primary);
+}
+
+.reply-form {
+    margin-top: 15px;
+}
+
+.reply-form textarea {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    color: var(--light);
+    resize: vertical;
+    margin-bottom: 10px;
+}
+
+.reply-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.replies {
+    margin-top: 15px;
+}
+
+.no-comments {
+    text-align: center;
+    color: var(--gray);
+    padding: 40px;
+}
+
+.blog-sidebar .sidebar-widget {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.sticky-widget {
+    position: sticky;
+    top: 120px;
+}
+
+.sidebar-widget h3 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: var(--secondary);
+}
+
+.toc a {
+    display: block;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: var(--light);
+    transition: var(--transition);
+}
+
+.toc a:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.related-blogs {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.related-blog-item {
+    display: flex;
+    gap: 15px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    transition: var(--transition);
+}
+
+.related-blog-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
+}
+
+.related-blog-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.related-blog-info {
+    flex: 1;
+}
+
+.related-blog-info h4 {
+    font-size: 0.95rem;
+    color: var(--light);
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.related-blog-info span {
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+@media (max-width: 1024px) {
+    .blog-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .blog-sidebar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    
+    .sticky-widget {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .blog-title {
+        font-size: 2rem;
+    }
+    
+    .blog-meta-info {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .comment.reply {
+        margin-left: 20px;
+    }
+    
+    .share-buttons {
+        flex-direction: column;
+    }
+    
+    .share-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block head_scripts %}
+{% endblock %}
+
+{% block body %}
+<main>
+    <article class="blog-detail">
+        <div class="container">
+            <!-- Blog Header -->
+            <div class="blog-header">
+                <div class="blog-breadcrumb">
+                    <a href="{% url 'blogs_list' %}">Blogs</a>
+                    {% if blog.category %}
+                    <span>/</span>
+                    <a href="?category={{ blog.category.slug }}">{{ blog.category.name }}</a>
+                    {% endif %}
+                    <span>/</span>
+                    <span>{{ blog.title|truncatewords:5 }}</span>
+                </div>
+                
+                {% if blog.category %}
+                <span class="category-badge">{{ blog.category.name }}</span>
+                {% endif %}
+                
+                <h1 class="blog-title">{{ blog.title }}</h1>
+                
+                <div class="blog-meta-info">
+                    <div class="author-card">
+                        <div class="author-avatar">
+                            {% if blog.author.profile.profile_picture %}
+                            <img src="{{ blog.author.profile.profile_picture.url }}" alt="{{ blog.author.get_full_name|default:blog.author.username }}">
+                            {% else %}
+                            <i class="fas fa-user-circle"></i>
+                            {% endif %}
+                        </div>
+                        <div class="author-details">
+                            <strong>{{ blog.author.get_full_name|default:blog.author.username }}</strong>
+                            <span>{{ blog.published_at|date:"F d, Y" }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="blog-stats-header">
+                        <span><i class="fas fa-clock"></i> {{ blog.read_time }} min read</span>
+                        <span><i class="fas fa-eye"></i> {{ blog.views }} views</span>
+                        <span><i class="fas fa-comments"></i> {{ comments.count }} comments</span>
+                    </div>
+                </div>
+                
+                {% if request.user.is_staff %}
+                <div class="admin-controls">
+                    <a href="{% url 'edit_blog' blog.slug %}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <form method="post" action="{% url 'delete_blog' blog.slug %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this blog?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="blog-layout">
+                <!-- Main Content -->
+                <div class="blog-main-content">
+                    <!-- Featured Image -->
+                    {% if blog.featured_image %}
+                    <div class="blog-featured-image">
+                        <img src="{{ blog.featured_image.url }}" alt="{{ blog.title }}">
+                    </div>
+                    {% endif %}
+
+                    <!-- Blog Content -->
+                    <div class="blog-content markdown-content">
+                        {{ blog.content|safe }}
+                    </div>
+
+                    <!-- Blog Sections -->
+                    {% for section in sections %}
+                    <div class="blog-section section-{{ section.section_type }}">
+                        {% if section.title %}
+                        <h3 class="section-title">{{ section.title }}</h3>
+                        {% endif %}
+
+                        {% if section.section_type == 'text' %}
+                            <div class="markdown-content">{{ section.content|safe }}</div>
+                        
+                        {% elif section.section_type == 'image' and section.image %}
+                            <div class="section-image">
+                                <img src="{{ section.image.url }}" alt="{{ section.title }}">
+                                {% if section.content %}
+                                <p class="image-caption">{{ section.content }}</p>
+                                {% endif %}
+                            </div>
+                        
+                        {% elif section.section_type == 'video' and section.video_url %}
+                            <div class="section-video">
+                                {% if 'youtube.com' in section.video_url or 'youtu.be' in section.video_url %}
+                                <iframe src="{{ section.video_url }}" frameborder="0" allowfullscreen></iframe>
+                                {% else %}
+                                <iframe src="{{ section.video_url }}" frameborder="0" allowfullscreen></iframe>
+                                {% endif %}
+                                {% if section.content %}
+                                <p class="video-caption">{{ section.content }}</p>
+                                {% endif %}
+                            </div>
+                        
+                        {% elif section.section_type == 'quote' %}
+                            <blockquote class="section-quote">
+                                {{ section.content|safe }}
+                            </blockquote>
+                        
+                        {% elif section.section_type == 'code' %}
+                            <pre class="section-code"><code>{{ section.content }}</code></pre>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <!-- Share Section -->
+                    <div class="share-section">
+                        <h3>Share this article</h3>
+                        <div class="share-buttons">
+                            <button class="share-btn facebook" data-platform="facebook">
+                                <i class="fab fa-facebook-f"></i> Facebook
+                            </button>
+                            <button class="share-btn twitter" data-platform="twitter">
+                                <i class="fab fa-twitter"></i> Twitter
+                            </button>
+                            <button class="share-btn linkedin" data-platform="linkedin">
+                                <i class="fab fa-linkedin-in"></i> LinkedIn
+                            </button>
+                            <button class="share-btn copy" data-platform="copy">
+                                <i class="fas fa-link"></i> Copy Link
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div class="comments-section">
+                        <h2 class="comments-title">
+                            <i class="fas fa-comments"></i> Comments ({{ comments.count }})
+                        </h2>
+
+                        <!-- Add Comment Form -->
+                        {% if request.user.is_authenticated %}
+                        <form method="post" action="{% url 'add_comment' blog.slug %}" class="comment-form">
+                            {% csrf_token %}
+                            <textarea name="content" placeholder="Share your thoughts..." rows="4" required></textarea>
+                            <button type="submit" class="btn btn-primary">Post Comment</button>
+                        </form>
+                        {% else %}
+                        <div class="login-prompt">
+                            <p>Please <a href="{% url 'login' %}?next={{ request.path }}">login</a> to leave a comment.</p>
+                        </div>
+                        {% endif %}
+
+                        <!-- Comments List -->
+                        <div class="comments-list">
+                            {% for comment in comments %}
+                            <div class="comment" id="comment-{{ comment.id }}">
+                                <div class="comment-avatar">
+                                    {% if comment.user.profile.profile_picture %}
+                                    <img src="{{ comment.user.profile.profile_picture.url }}" alt="{{ comment.user.get_full_name|default:comment.user.username }}">
+                                    {% else %}
+                                    <i class="fas fa-user-circle"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="comment-content">
+                                    <div class="comment-header">
+                                        <strong>{{ comment.user.get_full_name|default:comment.user.username }}</strong>
+                                        <span class="comment-date">{{ comment.created_at|timesince }} ago</span>
+                                    </div>
+                                    <p>{{ comment.content }}</p>
+                                    
+                                    {% if request.user.is_authenticated %}
+                                    <button class="reply-btn" onclick="toggleReplyForm('{{ comment.id }}')">
+                                        <i class="fas fa-reply"></i> Reply
+                                    </button>
+                                    {% endif %}
+
+                                    <!-- Reply Form -->
+                                    <div class="reply-form" id="reply-form-{{ comment.id }}" style="display: none;">
+                                        <form method="post" action="{% url 'add_comment' blog.slug %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                                            <textarea name="content" placeholder="Write your reply..." rows="3" required></textarea>
+                                            <div class="reply-actions">
+                                                <button type="submit" class="btn btn-primary btn-sm">Reply</button>
+                                                <button type="button" class="btn btn-secondary btn-sm" onclick=`toggleReplyForm({{ comment.id }})`>Cancel</button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <!-- Replies -->
+                                    {% if comment.get_replies %}
+                                    <div class="replies">
+                                        {% for reply in comment.get_replies %}
+                                        <div class="comment reply">
+                                            <div class="comment-avatar">
+                                                {% if reply.user.profile.profile_picture %}
+                                                <img src="{{ reply.user.profile.profile_picture.url }}" alt="{{ reply.user.get_full_name|default:reply.user.username }}">
+                                                {% else %}
+                                                <i class="fas fa-user-circle"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div class="comment-content">
+                                                <div class="comment-header">
+                                                    <strong>{{ reply.user.get_full_name|default:reply.user.username }}</strong>
+                                                    <span class="comment-date">{{ reply.created_at|timesince }} ago</span>
+                                                </div>
+                                                <p>{{ reply.content }}</p>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="no-comments">No comments yet. Be the first to comment!</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <aside class="blog-sidebar">
+                    <!-- Table of Contents -->
+                    <div class="sidebar-widget sticky-widget">
+                        <h3>Quick Navigation</h3>
+                        <div class="toc">
+                            <a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">
+                                <i class="fas fa-arrow-up"></i> Back to Top
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Related Blogs -->
+                    {% if related_blogs %}
+                    <div class="sidebar-widget">
+                        <h3>Related Articles</h3>
+                        <div class="related-blogs">
+                            {% for related in related_blogs %}
+                            <a href="{% url 'blog_detail' related.slug %}" class="related-blog-item">
+                                {% if related.featured_image %}
+                                <img src="{{ related.featured_image.url }}" alt="{{ related.title }}">
+                                {% endif %}
+                                <div class="related-blog-info">
+                                    <h4>{{ related.title|truncatewords:8 }}</h4>
+                                    <span><i class="fas fa-clock"></i> {{ related.read_time }} min</span>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </aside>
+            </div>
+        </div>
+    </article>
+</main>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+function toggleReplyForm(commentId) {
+    const form = document.getElementById('reply-form-' + commentId);
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+    } else {
+        form.style.display = 'none';
+    }
+}
+
+// Share functionality
+document.querySelectorAll('.share-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const platform = this.getAttribute('data-platform');
+        const url = encodeURIComponent(window.location.href);
+        const title = encodeURIComponent(document.querySelector('.blog-title').innerText);
+        
+        let shareUrl = '';
+        
+        switch(platform) {
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                break;
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
+                break;
+            case 'linkedin':
+                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+                break;
+            case 'copy':
+                navigator.clipboard.writeText(window.location.href);
+                this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-link"></i> Copy Link';
+                }, 2000);
+                
+                // Track share
+                fetch("{% url 'share_blog' blog.slug %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'platform=copy'
+                });
+                return;
+        }
+        
+        if (shareUrl) {
+            window.open(shareUrl, '_blank', 'width=600,height=400');
+            
+            // Track share
+            fetch("{% url 'share_blog' blog.slug %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'platform=' + platform
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
