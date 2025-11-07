@@ -240,6 +240,15 @@ def dashboard(request):
     }
     return render(request, 'core/dashboard.html', context)
 
+def profile(request,pk):
+    user = User.objects.get(username=pk)
+    profile = Profile.objects.get(user=user)
+    context = {
+        'user': user,
+        'profile': profile,
+    }
+    return render(request, 'core/profile.html', context)
+
 @login_required(login_url='login')
 def edit_dashboard(request):
     if request.method == 'POST':

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-Dashboard - {{ profile.full_name }} |  MatSci Hub
+Profile - {{ profile.full_name }} |  MatSci Hub
 {% endblock %}
 
 {% block meta_links %}
@@ -187,7 +187,6 @@ Dashboard - {{ profile.full_name }} |  MatSci Hub
                     {% else %}
                     <img src="{% static 'images/user-default.png' %}" alt="Default Profile Picture">
                     {% endif %}
-                    <a href="{% url 'edit-dashboard' %}" class="btn btn-secondary">Edit Profile</a>
                 </div>
                 <div class="profile-details">
                     <p><i class="fas fa-university"></i>  {{ profile.institution }}</p>

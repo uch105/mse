@@ -318,7 +318,7 @@
                 <div class="profile-meta">
                     <div class="meta-item">
                         <i class="fa fa-user"></i>
-                        <span>@{{ profile_user.username }}</span>
+                        <a href="{% url 'core:profile' pk=profile_user.username %}"><span>See full profile @{{ profile_user.username }}</span></a>
                     </div>
                     <div class="meta-item">
                         <i class="fa fa-calendar"></i>
