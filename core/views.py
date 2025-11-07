@@ -135,10 +135,6 @@ def register(request):
 
         user = User.objects.create_user(username=email.split('@')[0], email=email, password=password, first_name=fname, last_name=lname, is_active=False)
         user.save()
-        profile = Profile.objects.create(user=user)
-        profile.save()
-        user_profile = UserProfile.objects.create(user=user)
-        user_profile.save()
 
         current_site = get_current_site(request)
         token = token_generator.make_token(user)
