@@ -159,7 +159,10 @@ def register(request):
 
         messages.success(request, 'Registration successful. We have sent a verification email to your email address.')
         return redirect('login')
-    context = {}
+    cf_site_key = config('MSE_LAB_CF_SITE_KEY', '')
+    context = {
+        'cf_site_key': cf_site_key,
+    }
     return render(request, 'core/register.html', context)
 
 def activate(request, uidb64, token):
