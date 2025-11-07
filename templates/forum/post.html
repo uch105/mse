@@ -942,7 +942,11 @@
             <div class="post-author-section">
                 <div class="author-details">
                     <div class="author-avatar">
+                        {% if topic.author.forum_profile.get_avatar_url %}
                         <img src="{{ topic.author.forum_profile.get_avatar_url }}" alt="{{ topic.author.username }}">
+                        {% else %}
+                        <img src="{% static 'images/user-default.png' %}" alt="{{ topic.author.username }}">
+                        {% endif %}
                     </div>
                     <div class="author-info-text">
                         <h4><a href="{% url 'forum:user_profile' username=topic.author.username %}">{{ topic.author.forum_profile.get_display_name }}</a></h4>

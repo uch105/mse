@@ -19,8 +19,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import requests
-from .models import *
-from .utils import send_email
+from core.models import *
+from core.utils import send_email
 from decouple import config
 from django.contrib.auth import get_user_model
 

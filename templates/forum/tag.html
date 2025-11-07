@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-{{ profile_user.forum_profile.get_display_name }} - MatSci Hub Forum
+{{ tag }} - MatSci Hub Forum
 {% endblock %}
 
 {% block meta_links %}
@@ -310,49 +310,7 @@
     <div class="profile-container">
         <!-- Profile Header -->
         <div class="profile-header">
-            <div class="profile-avatar-large">
-                <img src="{{ profile.get_avatar_url }}" alt="{{ profile_user.username }}">
-            </div>
-            <div class="profile-info">
-                <h1>{{ profile.get_display_name }}</h1>
-                <div class="profile-meta">
-                    <div class="meta-item">
-                        <i class="fa fa-user"></i>
-                        <span>@{{ profile_user.username }}</span>
-                    </div>
-                    <div class="meta-item">
-                        <i class="fa fa-calendar"></i>
-                        <span>Joined {{ profile_user.date_joined|date:"F Y" }}</span>
-                    </div>
-                    {% if profile.location %}
-                    <div class="meta-item">
-                        <i class="fa fa-map-marker"></i>
-                        <span>{{ profile.location }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-                {% if profile.bio %}
-                <p class="profile-bio">{{ profile.bio }}</p>
-                {% endif %}
-                <div class="profile-stats">
-                    <div class="stat-box">
-                        <span class="stat-value">{{ profile.reputation }}</span>
-                        <span class="stat-label">Reputation</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-value">{{ profile.topic_count }}</span>
-                        <span class="stat-label">Topics</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-value">{{ profile.reply_count }}</span>
-                        <span class="stat-label">Replies</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-value">{{ profile.total_posts }}</span>
-                        <span class="stat-label">Total Posts</span>
-                    </div>
-                </div>
-            </div>
+            <p>{{ tag }}</p>
         </div>
 
         <!-- Tabs -->

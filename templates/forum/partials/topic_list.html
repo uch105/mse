@@ -45,7 +45,11 @@
         <div class="topic-footer">
             <div class="author-info">
                 <div class="avatar">
+                    {% if topic.author.forum_profile.get_avatar_url %}
                     <img src="{{ topic.author.forum_profile.get_avatar_url }}" alt="{{ topic.author.username }}">
+                    {% else %}
+                    <img src="{% static 'images/user-default.png' %}" alt="{{ topic.author.username }}">
+                    {% endif %}
                 </div>
                 <a href="{% url 'forum:user_profile' username=topic.author.username %}">{{ topic.author.forum_profile.get_display_name }}</a>
                 <span class="activity-time">{{ topic.created_at|timesince }} ago</span>

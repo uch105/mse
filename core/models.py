@@ -794,10 +794,13 @@ class UserProfile(models.Model):
         return f"{self.user.username}'s Profile"
     
     def get_avatar_url(self):
-        """Get avatar URL or return default"""
+        """Return forum avatar, or fallback to profile picture, or default"""
         if self.avatar:
             return self.avatar.url
-        return '/static/images/user-default.png'
+        elif hasattr(self.user, "profile") and self.user.profile.profile_picture:
+            return self.user.profile.profile_picture.url
+        else:
+            return ''
     
     def get_display_name(self):
         """Get user's display name"""
