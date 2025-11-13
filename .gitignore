@@ -37,7 +37,6 @@ db.sqlite3
 local_settings.py
 *.sock
 *.service
-*.uch
 
 # ---- Build / Compiled files ----
 dist/
