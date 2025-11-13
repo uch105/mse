@@ -37,19 +37,12 @@ Login - MatSci Hub
                     </button>
                 </div>
             </div>
-
-            <div class="form-group captcha-group">
-                <label for="captcha" class="form-label">Verification</label>
-                <div class="captcha-box">
-                    <img src="{% url 'generate_captcha' %}" alt="Captcha" class="captcha-image" id="captcha-img" style="border-radius: 10px;">
-                    <button type="button" class="refresh-captcha" id="refresh-captcha" title="Reload captcha">
-                    Refresh
-                    </button>
-                </div>
-                <input type="text" id="captcha" name="captcha" class="form-control" placeholder="Enter text shown above" required>
-            </div>
             
             <div class="form-options">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember-me">
+                    <label for="remember-me">Remember me</label>
+                </div>
                 <a href="{% url 'forgotpassword' %}" class="forgot-password">Forgot Password?</a>
             </div>
             
@@ -90,11 +83,5 @@ Login - MatSci Hub
             });
         });
     }
-</script>
-<script>
-    document.getElementById('refresh-captcha').addEventListener('click', () => {
-        const captchaImg = document.getElementById('captcha-img');
-        captchaImg.src = "{% url 'generate_captcha' %}?v=" + Date.now();
-    });
 </script>
 {% endblock %}
