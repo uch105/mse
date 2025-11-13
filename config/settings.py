@@ -114,6 +114,10 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
 
+CRONJOBS = [
+    ('0 9 * * *', 'core.cron.send_new_content_notifications'),
+]
+
 from django.contrib.messages import constants as messages
 
 MESSAGE_TAGS = {

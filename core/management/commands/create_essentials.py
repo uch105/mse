@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from core.models import Category, Tag
+from core.models import Category
 
 class Command(BaseCommand):
     help = 'Creates sample forum data for testing'

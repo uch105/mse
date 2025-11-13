@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>New Updates</title>
+    <style>
+        body { font-family: Arial, sans-serif; color:#333; }
+        .container { padding:20px; background:#f7f7f7; }
+        h2 { color:#2c3e50; }
+        .item { background:#fff; padding:15px; margin-bottom:10px; border-radius:8px; }
+        .title { font-size:18px; font-weight:bold; color:#2980b9; }
+        .type { font-size:14px; color:#555; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>New Updates Published</h2>
+
+    {% for item in items %}
+        <div class="item">
+            <div class="type">{{ item.type }}</div>
+            <div class="title">{{ item.title }}</div>
+            <p>{{ item.summary }}</p>
+            <a href="{{ item.url }}">Read More</a>
+        </div>
+    {% endfor %}
+
+    <br>
+    <p>Best regards,<br>Team, Materials Science Hub</p>
+</div>
+</body>
+</html>

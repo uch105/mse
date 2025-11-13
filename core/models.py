@@ -119,7 +119,8 @@ class PressRelease(models.Model):
     disclaimer = models.TextField(blank=True, help_text="Optional legal disclaimer or note")
     content = models.TextField(blank=True)
     meta_tags = models.TextField(blank=True, help_text="Comma-separated meta tags for SEO")
-    published_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    notified = models.BooleanField(default=False)
 
     @property
     def tag_list(self):
@@ -127,6 +128,9 @@ class PressRelease(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def get_absolute_url(self):
+        return f"/press/{self.id}/"
 
 # ===========================================
 # Careers
@@ -141,10 +145,11 @@ class Career(models.Model):
     location = models.CharField(max_length=255, blank=True)
     job_type = models.CharField(max_length=100, blank=True, help_text="e.g., Engineering, Research, Marketing")
     employment_type = models.CharField(max_length=50, blank=True, help_text="e.g., Remote, Urgent")
-    posted_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     application_deadline = models.CharField(max_length=255, blank=True)
     job_tags = models.TextField(blank=True, help_text="Comma-separated list of job tags (e.g., Python, ML, Data Science)")
     accepting = models.BooleanField(default=True, help_text="Is this position currently accepting applications?")
+    notified = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
@@ -152,6 +157,9 @@ class Career(models.Model):
     @property
     def tag_list(self):
         return [t.strip() for t in self.job_tags.split(',')]
+    
+    def get_absolute_url(self):
+        return f"/careers/"
 
 class CareerApplication(models.Model):
     career = models.ForeignKey(Career, on_delete=models.CASCADE, related_name="applications")
@@ -237,6 +245,7 @@ class Blog(models.Model):
     # Featured & Trending
     is_featured = models.BooleanField(default=False)
     is_trending = models.BooleanField(default=False)
+    notified = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-published_at', '-created_at']
