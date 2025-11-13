@@ -37,7 +37,8 @@ db.sqlite3
 local_settings.py
 *.sock
 *.service
-*.uch
+
+# GIT IS PULLED
 
 # ---- Build / Compiled files ----
 dist/
