@@ -39,6 +39,21 @@ def markdown_to_html(text):
         extensions=["extra", "toc", "sane_lists"]
     )
 
+# ========================================
+# General Views
+# ========================================
+
+from django.http import HttpResponse
+from .utils import generate_captcha
+
+def generate_captcha_view(request):
+    request.session.pop('captcha_text', None)
+    text, image = generate_captcha()
+    request.session['captcha_text'] = text
+
+    response = HttpResponse(content_type='image/png')
+    image.save(response, 'PNG')
+    return response
 
 def index(request):
     context = {}
@@ -59,17 +74,34 @@ def login_view(request):
         
         email = request.POST.get('email')
         password = request.POST.get('password')
-        user = authenticate(request, username=email.split('@')[0], password=password)
-        if user is not None:
-            if user.is_active:
-                login(request,user)
-                return redirect(next_url or 'dashboard')
-            else:
-                messages.error(request, 'Your account is inactive. Please check your email for the activation link.')
-                return redirect('login')
-        else:
+        captcha_input = request.POST.get('captcha', '').strip().upper()
+        captcha_session = request.session.get('captcha_text', '').upper()
+
+        if captcha_input != captcha_session:
+            messages.error(request, "Invalid captcha. Please try again.")
+            return redirect('register')
+        
+        request.session.pop('captcha_text', None)
+
+        username = email.split('@')[0]
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
             messages.error(request, 'Invalid email or password.')
             return redirect('login')
+
+        if not user.check_password(password):
+            messages.error(request, 'Invalid email or password.')
+            return redirect('login')
+
+        if not user.is_active:
+            messages.warning(request, 'Your account is inactive. Please check your email for the activation link.')
+            return redirect('login')
+
+        login(request, user)
+        return redirect(next_url or 'dashboard')
+    
     context = {
         'next': request.GET.get('next', ''),
     }
@@ -87,6 +119,14 @@ def register(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         password2 = request.POST.get('password2')
+        captcha_input = request.POST.get('captcha', '').strip().upper()
+        captcha_session = request.session.get('captcha_text', '').upper()
+
+        if captcha_input != captcha_session:
+            messages.error(request, "Invalid captcha. Please try again.")
+            return redirect('register')
+        
+        request.session.pop('captcha_text', None)
 
         if password != password2:
             messages.error(request, 'Passwords do not match.')

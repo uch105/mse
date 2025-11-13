@@ -28,6 +28,11 @@
             <span class="message-text">{{ message }}</span>
             <button class="close-btn" onclick="this.parentElement.remove()">×</button>
         </div>
+        {% if 'captcha' in message.tags or 'Invalid captcha' in message %}
+        <script>
+            document.getElementById('captcha-img').src = "{% url 'generate_captcha' %}?v=" + Date.now();
+        </script>
+        {% endif %}
         {% endfor %}
     </div>
     {% endif %}
