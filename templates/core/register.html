@@ -7,6 +7,16 @@ Register - MatSci Hub
 
 {% block meta_links %}
 <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+<style>
+    .terms-highlight {
+        animation: blinkRed 0.5s ease-in-out 3;
+    }
+
+    @keyframes blinkRed {
+        0%, 100% { color: inherit; }
+        50% { color: red; }
+    }
+</style>
 {% endblock %}
 
 {% block head_scripts %}
@@ -60,11 +70,25 @@ Register - MatSci Hub
             <div class="form-group">
                 <div class="remember-me">
                     <input type="checkbox" id="terms" required>
-                    <label for="terms">I agree to the <a href="{% url 'terms' %}" target="_blank" style="color: var(--secondary);">Terms of Service</a> and <a href="{% url 'privacy' %}" target="_blank" style="color: var(--secondary);">Privacy Policy</a></label>
+                    <label for="terms"  id="terms-label">I agree to the 
+                    <a href="{% url 'terms' %}" target="_blank" style="color: var(--secondary);">Terms of Service</a> 
+                    and 
+                    <a href="{% url 'privacy' %}" target="_blank" style="color: var(--secondary);">Privacy Policy</a></label>
                 </div>
             </div>
+
+            <div class="form-group captcha-group">
+                <label for="captcha" class="form-label">Verification</label>
+                <div class="captcha-box">
+                    <img src="{% url 'generate_captcha' %}" alt="Captcha" class="captcha-image" id="captcha-img" style="border-radius: 10px;">
+                    <button type="button" class="refresh-captcha" id="refresh-captcha" title="Reload captcha">
+                    Refresh
+                    </button>
+                </div>
+                <input type="text" id="captcha" name="captcha" class="form-control" placeholder="Enter text shown above" required>
+            </div>
             
-            <button type="submit" class="btn btn-primary auth-btn">Create Account</button>
+            <button type="submit" id="register-btn" class="btn btn-primary auth-btn" disabled>Create Account</button>
         </form>
         
         <div class="auth-footer">
@@ -80,6 +104,7 @@ Register - MatSci Hub
     document.addEventListener('DOMContentLoaded', function() {
         // Setup password toggle functionality
         setupPasswordToggles();
+        setupTermsValidation();
     });
     
     function setupPasswordToggles() {
@@ -101,5 +126,30 @@ Register - MatSci Hub
             });
         });
     }
+
+
+    function setupTermsValidation() {
+        const checkbox = document.getElementById('terms');
+        const button = document.getElementById('register-btn');
+        const label = document.getElementById('terms-label');
+
+        checkbox.addEventListener('change', () => {
+            button.disabled = !checkbox.checked;
+        });
+
+        document.getElementById('registration-form').addEventListener('submit', (e) => {
+            if (!checkbox.checked) {
+                e.preventDefault();
+                label.classList.add('terms-highlight');
+                setTimeout(() => label.classList.remove('terms-highlight'), 1500);
+            }
+        });
+    }
+</script>
+<script>
+    document.getElementById('refresh-captcha').addEventListener('click', () => {
+        const captchaImg = document.getElementById('captcha-img');
+        captchaImg.src = "{% url 'generate_captcha' %}?v=" + Date.now();
+    });
 </script>
 {% endblock %}
