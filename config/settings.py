@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "matscichat",
     "blogs",
     "forum",
+    "django_crontab",
 ]
 
 MIDDLEWARE = [

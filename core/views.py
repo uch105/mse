@@ -44,10 +44,9 @@ def markdown_to_html(text):
 # ========================================
 
 from django.http import HttpResponse
-from .utils import generate_captcha
+from core.utils import generate_captcha
 
 def generate_captcha_view(request):
-    request.session.pop('captcha_text', None)
     text, image = generate_captcha()
     request.session['captcha_text'] = text
 
