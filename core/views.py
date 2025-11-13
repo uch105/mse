@@ -56,24 +56,6 @@ def resources(request):
 def login_view(request):
     next_url = request.GET.get('next') or request.POST.get('next')
     if request.method == 'POST':
-        cf_token = request.POST.get('cf-turnstile-response')
-        if not cf_token:
-            messages.error(request, "Please complete the verification.")
-            return redirect('login')
-
-        response = requests.post(
-            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-            data={
-                'secret': config('MSE_LAB_CF_SECRET_KEY', ''),
-                'response': cf_token,
-                'remoteip': request.META.get('REMOTE_ADDR')
-            }
-        )
-
-        result = response.json()
-        if not result.get('success'):
-            messages.error(request, "Verification failed. Try again.")
-            return redirect('login')
         
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -88,10 +70,8 @@ def login_view(request):
         else:
             messages.error(request, 'Invalid email or password.')
             return redirect('login')
-    cf_site_key = config('MSE_LAB_CF_SITE_KEY', '')
     context = {
         'next': request.GET.get('next', ''),
-        'cf_site_key': cf_site_key,
     }
     return render(request, 'core/login.html', context)
 
@@ -101,24 +81,6 @@ def logout_view(request):
 
 def register(request):
     if request.method == 'POST':
-        cf_token = request.POST.get('cf-turnstile-response')
-        if not cf_token:
-            messages.error(request, "Please complete the verification.")
-            return redirect('register')
-
-        response = requests.post(
-            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-            data={
-                'secret': config('MSE_LAB_CF_SECRET_KEY', ''),
-                'response': cf_token,
-                'remoteip': request.META.get('REMOTE_ADDR')
-            }
-        )
-
-        result = response.json()
-        if not result.get('success'):
-            messages.error(request, "Verification failed. Try again.")
-            return redirect('register')
 
         fname = request.POST.get('fname')
         lname = request.POST.get('lname')
@@ -155,10 +117,7 @@ def register(request):
 
         messages.success(request, 'Registration successful. We have sent a verification email to your email address.')
         return redirect('login')
-    cf_site_key = config('MSE_LAB_CF_SITE_KEY', '')
-    context = {
-        'cf_site_key': cf_site_key,
-    }
+    context = {}
     return render(request, 'core/register.html', context)
 
 def activate(request, uidb64, token):

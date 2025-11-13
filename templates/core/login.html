@@ -7,7 +7,6 @@ Login - MatSci Hub
 
 {% block meta_links %}
 <link rel="stylesheet" href="{% static 'css/auth.css' %}">
-<link rel="preconnect" href="https://challenges.cloudflare.com">
 {% endblock %}
 
 {% block head_scripts %}
@@ -46,14 +45,6 @@ Login - MatSci Hub
                 </div>
                 <a href="{% url 'forgotpassword' %}" class="forgot-password">Forgot Password?</a>
             </div>
-
-            <div
-                class="cf-turnstile"
-                data-sitekey="{{ cf_site_key }}"
-                data-theme="light"
-                data-size="normal"
-                data-callback="onSuccess"
-            ></div>
             
             <button type="submit" class="btn btn-primary auth-btn">Log In</button>
         </form>
@@ -93,9 +84,4 @@ Login - MatSci Hub
         });
     }
 </script>
-<script
-  src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-  async
-  defer
-></script>
 {% endblock %}
