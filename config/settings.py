@@ -136,6 +136,16 @@ USE_I18N = True
 
 USE_TZ = True
 
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://materialsscience.net",
+]
+
+
 STATIC_URL = 'static/'
 if DEBUG:
     STATICFILES_DIRS = [
