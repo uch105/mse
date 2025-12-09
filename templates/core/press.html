@@ -182,7 +182,7 @@
     <div class="container">
         <section class="press-details">
             <h1>{{ press.title }}</h1>
-            <p class="press-date"><i class="far fa-calendar"></i> {{ press.published_at|date:"F j, Y" }}</p>
+            <p class="press-date"><i class="far fa-calendar"></i> {{ press.created_at|date:"F j, Y" }}</p>
             <p class="press-category">Category: {{ press.category }}</p>
             <div class="press-content">
                 {{ press_html|safe }}

@@ -221,7 +221,7 @@ Press Releases - Materials Science Hub
                 <span class="press-category">{{ press.category }}</span>
                 <div class="press-date">
                     <i class="far fa-calendar"></i>
-                    {{ press.published_at|date:"F j, Y" }}
+                    {{ press.created_at|date:"F j, Y" }}
                 </div>
                 <h2 class="press-title-card">{{ press.title }}</h2>
                 <p class="press-excerpt">{{ press.disclaimer|safe }}</p>

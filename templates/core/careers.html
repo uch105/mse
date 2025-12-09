@@ -295,7 +295,7 @@ Careers - Materails Science Hub
             <div class="jobs-grid">
             {% for career in careers %}
                 <div class="card job-card" data-department="engineering" data-remote="true">
-                    <span class="job-badge {{ career.employment_type }}">{{ career.employment_type }}</span>
+                    <span class="job-badge {{ career.location }}">{{ career.location }}</span>
                     <span class="job-department">Engineering</span>
                     <h3 class="job-title">{{ career.title }}</h3>
                     <div class="job-meta">
@@ -309,7 +309,7 @@ Careers - Materails Science Hub
                         </div>
                         <div class="job-meta-item">
                             <i class="fas fa-clock"></i>
-                            <span>Posted: {{ career.posted_at }}</span>
+                            <span>Posted: {{ career.created_at }}</span>
                         </div>
                     </div>
                     <p class="job-description">{{ career.description }}</p>
