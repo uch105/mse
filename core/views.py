@@ -304,7 +304,7 @@ def about(request):
     return render(request, 'core/about.html', context)
 
 def careers(request):
-    careers = Career.objects.filter(accepting=True).order_by('-posted_at')
+    careers = Career.objects.filter(accepting=True).order_by('-created_at')
     context = {
         'careers': careers,
         }
@@ -336,7 +336,7 @@ def career_apply(request,pk):
     return render(request, 'core/career-apply.html', context)
 
 def presses(request):
-    presses = PressRelease.objects.all().order_by('-published_at')
+    presses = PressRelease.objects.all().order_by('-created_at')
     context = {
         'presses': presses,
     }
