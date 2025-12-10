@@ -135,21 +135,30 @@ Materials - MatSci Hub
         margin-bottom: 30px;
     }
     
+    .periodic-table-wrapper {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
     .periodic-table {
         display: grid;
         grid-template-columns: repeat(18, 1fr);
         gap: 4px;
-        max-width: 1200px;
+        min-width: 1000px;
         margin: 0 auto;
-        padding: 20px;
-        background: #f8f9fa;
-        border-radius: 12px;
     }
     
     .element {
         aspect-ratio: 1;
+        min-width: 50px;
         border: 2px solid #ddd;
         border-radius: 6px;
+        padding: 8px;
         text-align: center;
         cursor: pointer;
         transition: all 0.3s;
@@ -251,13 +260,33 @@ Materials - MatSci Hub
             font-size: 16px;
         }
         
-        .periodic-table {
-            grid-template-columns: repeat(9, 1fr);
-            gap: 2px;
+        .search-filter-section {
+            flex-direction: column;
+        }
+        
+        .search-input,
+        .filter-select,
+        .search-btn {
+            width: 100%;
+        }
+        
+        .section-title {
+            font-size: 22px;
+        }
+        
+        .periodic-table-wrapper {
             padding: 10px;
+            margin: 0 -15px;
+            border-radius: 5px;
+        }
+        
+        .periodic-table {
+            min-width: 900px;
+            gap: 3px;
         }
         
         .element {
+            min-width: 45px;
             font-size: 10px;
             padding: 4px;
         }
@@ -272,14 +301,70 @@ Materials - MatSci Hub
         
         .element-number {
             font-size: 6px;
+            top: 1px;
+            left: 2px;
         }
         
         .legend {
             gap: 10px;
+            padding: 0 10px;
         }
         
         .legend-label {
             font-size: 11px;
+        }
+        
+        .legend-color {
+            width: 25px;
+            height: 18px;
+        }
+    }
+    
+    @media screen and (max-width: 480px) {
+        .page-header h1 {
+            font-size: 24px;
+        }
+        
+        .page-header p {
+            font-size: 14px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+        }
+        
+        .periodic-table {
+            min-width: 800px;
+            gap: 2px;
+        }
+        
+        .element {
+            min-width: 40px;
+            font-size: 9px;
+            padding: 3px;
+            border-width: 1px;
+        }
+        
+        .element-symbol {
+            font-size: 12px;
+        }
+        
+        .element-name {
+            font-size: 6px;
+            display: none;
+        }
+        
+        .element-number {
+            font-size: 5px;
+        }
+        
+        .legend {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .legend-item {
+            width: 100%;
         }
     }
 </style>
@@ -291,263 +376,266 @@ Materials - MatSci Hub
 {% block body %}
 <main>
     <div class="container">
-        <div class="materials-container">
-            <div class="page-header">
-                <h1>🔬 Materials Database</h1>
-                <p>Explore materials and their properties through our interactive periodic table</p>
+<div class="materials-container">
+    <div class="page-header">
+        <h1>🔬 Materials Database</h1>
+        <p>Explore materials and their properties through our interactive periodic table</p>
+    </div>
+    
+    <!-- Search Section -->
+    <div class="search-section">
+        <div class="search-box">
+            <input 
+                type="text" 
+                class="search-input" 
+                id="material-search"
+                placeholder="Search for materials, alloys, composites..."
+                autocomplete="off"
+            >
+            <span class="search-icon">🔍</span>
+            <div class="search-results" id="search-results"></div>
+        </div>
+    </div>
+    
+    <!-- Periodic Table Section -->
+    <div class="periodic-table-section">
+        <h2 class="section-title">Interactive Periodic Table</h2>
+        
+        <div class="periodic-table-wrapper">
+            <div class="periodic-table" id="periodic-table">
+            <!-- Row 1 -->
+            <div class="element nonmetal" data-symbol="H" data-number="1">
+                <span class="element-number">1</span>
+                <div class="element-symbol">H</div>
+                <div class="element-name">Hydrogen</div>
+            </div>
+            <div class="empty-cell" style="grid-column: span 16;"></div>
+            <div class="element noble-gas" data-symbol="He" data-number="2">
+                <span class="element-number">2</span>
+                <div class="element-symbol">He</div>
+                <div class="element-name">Helium</div>
             </div>
             
-            <!-- Search Section -->
-            <div class="search-section">
-                <div class="search-box">
-                    <input 
-                        type="text" 
-                        class="search-input" 
-                        id="material-search"
-                        placeholder="Search for materials, alloys, composites..."
-                        autocomplete="off"
-                    >
-                    <span class="search-icon">🔍</span>
-                    <div class="search-results" id="search-results"></div>
-                </div>
+            <!-- Row 2 -->
+            <div class="element alkali-metal" data-symbol="Li" data-number="3">
+                <span class="element-number">3</span>
+                <div class="element-symbol">Li</div>
+                <div class="element-name">Lithium</div>
+            </div>
+            <div class="element alkaline-earth" data-symbol="Be" data-number="4">
+                <span class="element-number">4</span>
+                <div class="element-symbol">Be</div>
+                <div class="element-name">Beryllium</div>
+            </div>
+            <div class="empty-cell" style="grid-column: span 10;"></div>
+            <div class="element metalloid" data-symbol="B" data-number="5">
+                <span class="element-number">5</span>
+                <div class="element-symbol">B</div>
+                <div class="element-name">Boron</div>
+            </div>
+            <div class="element nonmetal" data-symbol="C" data-number="6">
+                <span class="element-number">6</span>
+                <div class="element-symbol">C</div>
+                <div class="element-name">Carbon</div>
+            </div>
+            <div class="element nonmetal" data-symbol="N" data-number="7">
+                <span class="element-number">7</span>
+                <div class="element-symbol">N</div>
+                <div class="element-name">Nitrogen</div>
+            </div>
+            <div class="element nonmetal" data-symbol="O" data-number="8">
+                <span class="element-number">8</span>
+                <div class="element-symbol">O</div>
+                <div class="element-name">Oxygen</div>
+            </div>
+            <div class="element halogen" data-symbol="F" data-number="9">
+                <span class="element-number">9</span>
+                <div class="element-symbol">F</div>
+                <div class="element-name">Fluorine</div>
+            </div>
+            <div class="element noble-gas" data-symbol="Ne" data-number="10">
+                <span class="element-number">10</span>
+                <div class="element-symbol">Ne</div>
+                <div class="element-name">Neon</div>
             </div>
             
-            <!-- Periodic Table Section -->
-            <div class="periodic-table-section">
-                <h2 class="section-title">Interactive Periodic Table</h2>
-                
-                <div class="periodic-table" id="periodic-table">
-                    <!-- Row 1 -->
-                    <div class="element nonmetal" data-symbol="H" data-number="1">
-                        <span class="element-number">1</span>
-                        <div class="element-symbol">H</div>
-                        <div class="element-name">Hydrogen</div>
-                    </div>
-                    <div class="empty-cell" style="grid-column: span 16;"></div>
-                    <div class="element noble-gas" data-symbol="He" data-number="2">
-                        <span class="element-number">2</span>
-                        <div class="element-symbol">He</div>
-                        <div class="element-name">Helium</div>
-                    </div>
-                    
-                    <!-- Row 2 -->
-                    <div class="element alkali-metal" data-symbol="Li" data-number="3">
-                        <span class="element-number">3</span>
-                        <div class="element-symbol">Li</div>
-                        <div class="element-name">Lithium</div>
-                    </div>
-                    <div class="element alkaline-earth" data-symbol="Be" data-number="4">
-                        <span class="element-number">4</span>
-                        <div class="element-symbol">Be</div>
-                        <div class="element-name">Beryllium</div>
-                    </div>
-                    <div class="empty-cell" style="grid-column: span 10;"></div>
-                    <div class="element metalloid" data-symbol="B" data-number="5">
-                        <span class="element-number">5</span>
-                        <div class="element-symbol">B</div>
-                        <div class="element-name">Boron</div>
-                    </div>
-                    <div class="element nonmetal" data-symbol="C" data-number="6">
-                        <span class="element-number">6</span>
-                        <div class="element-symbol">C</div>
-                        <div class="element-name">Carbon</div>
-                    </div>
-                    <div class="element nonmetal" data-symbol="N" data-number="7">
-                        <span class="element-number">7</span>
-                        <div class="element-symbol">N</div>
-                        <div class="element-name">Nitrogen</div>
-                    </div>
-                    <div class="element nonmetal" data-symbol="O" data-number="8">
-                        <span class="element-number">8</span>
-                        <div class="element-symbol">O</div>
-                        <div class="element-name">Oxygen</div>
-                    </div>
-                    <div class="element halogen" data-symbol="F" data-number="9">
-                        <span class="element-number">9</span>
-                        <div class="element-symbol">F</div>
-                        <div class="element-name">Fluorine</div>
-                    </div>
-                    <div class="element noble-gas" data-symbol="Ne" data-number="10">
-                        <span class="element-number">10</span>
-                        <div class="element-symbol">Ne</div>
-                        <div class="element-name">Neon</div>
-                    </div>
-                    
-                    <!-- Row 3 -->
-                    <div class="element alkali-metal" data-symbol="Na" data-number="11">
-                        <span class="element-number">11</span>
-                        <div class="element-symbol">Na</div>
-                        <div class="element-name">Sodium</div>
-                    </div>
-                    <div class="element alkaline-earth" data-symbol="Mg" data-number="12">
-                        <span class="element-number">12</span>
-                        <div class="element-symbol">Mg</div>
-                        <div class="element-name">Magnesium</div>
-                    </div>
-                    <div class="empty-cell" style="grid-column: span 10;"></div>
-                    <div class="element post-transition" data-symbol="Al" data-number="13">
-                        <span class="element-number">13</span>
-                        <div class="element-symbol">Al</div>
-                        <div class="element-name">Aluminum</div>
-                    </div>
-                    <div class="element metalloid" data-symbol="Si" data-number="14">
-                        <span class="element-number">14</span>
-                        <div class="element-symbol">Si</div>
-                        <div class="element-name">Silicon</div>
-                    </div>
-                    <div class="element nonmetal" data-symbol="P" data-number="15">
-                        <span class="element-number">15</span>
-                        <div class="element-symbol">P</div>
-                        <div class="element-name">Phosphorus</div>
-                    </div>
-                    <div class="element nonmetal" data-symbol="S" data-number="16">
-                        <span class="element-number">16</span>
-                        <div class="element-symbol">S</div>
-                        <div class="element-name">Sulfur</div>
-                    </div>
-                    <div class="element halogen" data-symbol="Cl" data-number="17">
-                        <span class="element-number">17</span>
-                        <div class="element-symbol">Cl</div>
-                        <div class="element-name">Chlorine</div>
-                    </div>
-                    <div class="element noble-gas" data-symbol="Ar" data-number="18">
-                        <span class="element-number">18</span>
-                        <div class="element-symbol">Ar</div>
-                        <div class="element-name">Argon</div>
-                    </div>
-                    
-                    <!-- Row 4 - Main transition metals -->
-                    <div class="element alkali-metal" data-symbol="K" data-number="19">
-                        <span class="element-number">19</span>
-                        <div class="element-symbol">K</div>
-                        <div class="element-name">Potassium</div>
-                    </div>
-                    <div class="element alkaline-earth" data-symbol="Ca" data-number="20">
-                        <span class="element-number">20</span>
-                        <div class="element-symbol">Ca</div>
-                        <div class="element-name">Calcium</div>
-                    </div>
-                    <div class="element transition-metal" data-symbol="Sc" data-number="21">
-                        <span class="element-number">21</span>
-                        <div class="element-symbol">Sc</div>
-                        <div class="element-name">Scandium</div>
-                    </div>
-                    <div class="element transition-metal" data-symbol="Ti" data-number="22">
-                        <span class="element-number">22</span>
-                        <div class="element-symbol">Ti</div>
-                        <div class="element-name">Titanium</div>
-                    </div>
-                    <div class="element transition-metal" data-symbol="V" data-number="23">
-                        <span class="element-number">23</span>
-                        <div class="element-symbol">V</div>
-                        <div class="element-name">Vanadium</div>
-                    </div>
-                    <div class="element transition-metal" data-symbol="Cr" data-number="24">
-                        <span class="element-number">24</span>
-                        <div class="element-symbol">Cr</div>
-                        <div class="element-name">Chromium</div>
-                    </div>
-                    <div class="element transition-metal" data-symbol="Mn" data-number="25">
-                        <span class="element-number">25</span>
-                        <div class="element-symbol">Mn</div>
-                        <div class="element-name">Manganese</div>
-                    </div>
-                    <div class="element transition-metal" data-symbol="Fe" data-number="26">
-                        <span class="element-number">26</span>
-                        <div class="element-symbol">Fe</div>
-                        <div class="element-name">Iron</div>
-                    </div>
-                    <div class="element transition-metal" data-symbol="Co" data-number="27">
-                        <span class="element-number">27</span>
-                        <div class="element-symbol">Co</div>
-                        <div class="element-name">Cobalt</div>
-                    </div>
-                    <div class="element transition-metal" data-symbol="Ni" data-number="28">
-                        <span class="element-number">28</span>
-                        <div class="element-symbol">Ni</div>
-                        <div class="element-name">Nickel</div>
-                    </div>
-                    <div class="element transition-metal" data-symbol="Cu" data-number="29">
-                        <span class="element-number">29</span>
-                        <div class="element-symbol">Cu</div>
-                        <div class="element-name">Copper</div>
-                    </div>
-                    <div class="element transition-metal" data-symbol="Zn" data-number="30">
-                        <span class="element-number">30</span>
-                        <div class="element-symbol">Zn</div>
-                        <div class="element-name">Zinc</div>
-                    </div>
-                    <div class="element post-transition" data-symbol="Ga" data-number="31">
-                        <span class="element-number">31</span>
-                        <div class="element-symbol">Ga</div>
-                        <div class="element-name">Gallium</div>
-                    </div>
-                    <div class="element metalloid" data-symbol="Ge" data-number="32">
-                        <span class="element-number">32</span>
-                        <div class="element-symbol">Ge</div>
-                        <div class="element-name">Germanium</div>
-                    </div>
-                    <div class="element metalloid" data-symbol="As" data-number="33">
-                        <span class="element-number">33</span>
-                        <div class="element-symbol">As</div>
-                        <div class="element-name">Arsenic</div>
-                    </div>
-                    <div class="element nonmetal" data-symbol="Se" data-number="34">
-                        <span class="element-number">34</span>
-                        <div class="element-symbol">Se</div>
-                        <div class="element-name">Selenium</div>
-                    </div>
-                    <div class="element halogen" data-symbol="Br" data-number="35">
-                        <span class="element-number">35</span>
-                        <div class="element-symbol">Br</div>
-                        <div class="element-name">Bromine</div>
-                    </div>
-                    <div class="element noble-gas" data-symbol="Kr" data-number="36">
-                        <span class="element-number">36</span>
-                        <div class="element-symbol">Kr</div>
-                        <div class="element-name">Krypton</div>
-                    </div>
-                    
-                    <!-- Additional rows abbreviated for brevity - Add more as needed -->
-                </div>
-                
-                <!-- Legend -->
-                <div class="legend">
-                    <div class="legend-item">
-                        <div class="legend-color alkali-metal"></div>
-                        <span class="legend-label">Alkali Metals</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color alkaline-earth"></div>
-                        <span class="legend-label">Alkaline Earth</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color transition-metal"></div>
-                        <span class="legend-label">Transition Metals</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color post-transition"></div>
-                        <span class="legend-label">Post-transition</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color metalloid"></div>
-                        <span class="legend-label">Metalloids</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color nonmetal"></div>
-                        <span class="legend-label">Nonmetals</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color halogen"></div>
-                        <span class="legend-label">Halogens</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color noble-gas"></div>
-                        <span class="legend-label">Noble Gases</span>
-                    </div>
-                </div>
+            <!-- Row 3 -->
+            <div class="element alkali-metal" data-symbol="Na" data-number="11">
+                <span class="element-number">11</span>
+                <div class="element-symbol">Na</div>
+                <div class="element-name">Sodium</div>
+            </div>
+            <div class="element alkaline-earth" data-symbol="Mg" data-number="12">
+                <span class="element-number">12</span>
+                <div class="element-symbol">Mg</div>
+                <div class="element-name">Magnesium</div>
+            </div>
+            <div class="empty-cell" style="grid-column: span 10;"></div>
+            <div class="element post-transition" data-symbol="Al" data-number="13">
+                <span class="element-number">13</span>
+                <div class="element-symbol">Al</div>
+                <div class="element-name">Aluminum</div>
+            </div>
+            <div class="element metalloid" data-symbol="Si" data-number="14">
+                <span class="element-number">14</span>
+                <div class="element-symbol">Si</div>
+                <div class="element-name">Silicon</div>
+            </div>
+            <div class="element nonmetal" data-symbol="P" data-number="15">
+                <span class="element-number">15</span>
+                <div class="element-symbol">P</div>
+                <div class="element-name">Phosphorus</div>
+            </div>
+            <div class="element nonmetal" data-symbol="S" data-number="16">
+                <span class="element-number">16</span>
+                <div class="element-symbol">S</div>
+                <div class="element-name">Sulfur</div>
+            </div>
+            <div class="element halogen" data-symbol="Cl" data-number="17">
+                <span class="element-number">17</span>
+                <div class="element-symbol">Cl</div>
+                <div class="element-name">Chlorine</div>
+            </div>
+            <div class="element noble-gas" data-symbol="Ar" data-number="18">
+                <span class="element-number">18</span>
+                <div class="element-symbol">Ar</div>
+                <div class="element-name">Argon</div>
+            </div>
+            
+            <!-- Row 4 - Main transition metals -->
+            <div class="element alkali-metal" data-symbol="K" data-number="19">
+                <span class="element-number">19</span>
+                <div class="element-symbol">K</div>
+                <div class="element-name">Potassium</div>
+            </div>
+            <div class="element alkaline-earth" data-symbol="Ca" data-number="20">
+                <span class="element-number">20</span>
+                <div class="element-symbol">Ca</div>
+                <div class="element-name">Calcium</div>
+            </div>
+            <div class="element transition-metal" data-symbol="Sc" data-number="21">
+                <span class="element-number">21</span>
+                <div class="element-symbol">Sc</div>
+                <div class="element-name">Scandium</div>
+            </div>
+            <div class="element transition-metal" data-symbol="Ti" data-number="22">
+                <span class="element-number">22</span>
+                <div class="element-symbol">Ti</div>
+                <div class="element-name">Titanium</div>
+            </div>
+            <div class="element transition-metal" data-symbol="V" data-number="23">
+                <span class="element-number">23</span>
+                <div class="element-symbol">V</div>
+                <div class="element-name">Vanadium</div>
+            </div>
+            <div class="element transition-metal" data-symbol="Cr" data-number="24">
+                <span class="element-number">24</span>
+                <div class="element-symbol">Cr</div>
+                <div class="element-name">Chromium</div>
+            </div>
+            <div class="element transition-metal" data-symbol="Mn" data-number="25">
+                <span class="element-number">25</span>
+                <div class="element-symbol">Mn</div>
+                <div class="element-name">Manganese</div>
+            </div>
+            <div class="element transition-metal" data-symbol="Fe" data-number="26">
+                <span class="element-number">26</span>
+                <div class="element-symbol">Fe</div>
+                <div class="element-name">Iron</div>
+            </div>
+            <div class="element transition-metal" data-symbol="Co" data-number="27">
+                <span class="element-number">27</span>
+                <div class="element-symbol">Co</div>
+                <div class="element-name">Cobalt</div>
+            </div>
+            <div class="element transition-metal" data-symbol="Ni" data-number="28">
+                <span class="element-number">28</span>
+                <div class="element-symbol">Ni</div>
+                <div class="element-name">Nickel</div>
+            </div>
+            <div class="element transition-metal" data-symbol="Cu" data-number="29">
+                <span class="element-number">29</span>
+                <div class="element-symbol">Cu</div>
+                <div class="element-name">Copper</div>
+            </div>
+            <div class="element transition-metal" data-symbol="Zn" data-number="30">
+                <span class="element-number">30</span>
+                <div class="element-symbol">Zn</div>
+                <div class="element-name">Zinc</div>
+            </div>
+            <div class="element post-transition" data-symbol="Ga" data-number="31">
+                <span class="element-number">31</span>
+                <div class="element-symbol">Ga</div>
+                <div class="element-name">Gallium</div>
+            </div>
+            <div class="element metalloid" data-symbol="Ge" data-number="32">
+                <span class="element-number">32</span>
+                <div class="element-symbol">Ge</div>
+                <div class="element-name">Germanium</div>
+            </div>
+            <div class="element metalloid" data-symbol="As" data-number="33">
+                <span class="element-number">33</span>
+                <div class="element-symbol">As</div>
+                <div class="element-name">Arsenic</div>
+            </div>
+            <div class="element nonmetal" data-symbol="Se" data-number="34">
+                <span class="element-number">34</span>
+                <div class="element-symbol">Se</div>
+                <div class="element-name">Selenium</div>
+            </div>
+            <div class="element halogen" data-symbol="Br" data-number="35">
+                <span class="element-number">35</span>
+                <div class="element-symbol">Br</div>
+                <div class="element-name">Bromine</div>
+            </div>
+            <div class="element noble-gas" data-symbol="Kr" data-number="36">
+                <span class="element-number">36</span>
+                <div class="element-symbol">Kr</div>
+                <div class="element-name">Krypton</div>
+            </div>
+            
+            <!-- Additional rows abbreviated for brevity - Add more as needed -->
+        </div>
+    
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color alkali-metal"></div>
+                <span class="legend-label">Alkali Metals</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color alkaline-earth"></div>
+                <span class="legend-label">Alkaline Earth</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color transition-metal"></div>
+                <span class="legend-label">Transition Metals</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color post-transition"></div>
+                <span class="legend-label">Post-transition</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color metalloid"></div>
+                <span class="legend-label">Metalloids</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color nonmetal"></div>
+                <span class="legend-label">Nonmetals</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color halogen"></div>
+                <span class="legend-label">Halogens</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color noble-gas"></div>
+                <span class="legend-label">Noble Gases</span>
             </div>
         </div>
+    </div>
+</div>
     </div>
 </main>
 {% endblock %}

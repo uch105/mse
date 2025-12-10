@@ -7,9 +7,13 @@ MatSciChat - Materials Science Assistant
 
 {% block meta_links %}
 <style>
+    * {
+        box-sizing: border-box;
+    }
+    
     .chat-container {
         display: flex;
-        height: calc(100vh - 200px);
+        height: calc(100vh - 100px);
         max-width: 1600px;
         margin: 0 auto;
         gap: 20px;
@@ -23,6 +27,46 @@ MatSciChat - Materials Science Assistant
         padding: 20px;
         overflow-y: auto;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        flex-shrink: 0;
+    }
+    
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
+    
+    .mobile-header {
+        display: none;
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e0e0e0;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .menu-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 5px;
+        color: #333;
+    }
+    
+    .mobile-header h2 {
+        margin: 0;
+        font-size: 18px;
+        flex: 1;
     }
     
     .sidebar h3 {
@@ -158,7 +202,7 @@ MatSciChat - Materials Science Assistant
     
     .matscichat-message-content {
         flex: 1;
-        max-width: 1200px;
+        max-width: 800px;
     }
     
     .matscichat-message.user .matscichat-message-content {
@@ -316,6 +360,142 @@ MatSciChat - Materials Science Assistant
         border-radius: 4px;
         font-family: monospace;
     }
+
+    /* Default state (Desktop view): Show text, hide icon */
+    #matscichat-send-btn #chat-submit-btn-icon {
+        display: none;
+    }
+
+    #matscichat-send-btn #chat-submit-btn-text {
+        display: inline;
+    }
+    
+    /* Mobile Responsive Styles */
+    @media screen and (max-width: 768px) {
+        .chat-container {
+            padding: 0;
+            gap: 0;
+            height: 80vh;
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: -100%;
+            top: 0;
+            bottom: 0;
+            width: 80%;
+            max-width: 300px;
+            border-radius: 0;
+            z-index: 1000;
+            transition: left 0.3s ease;
+            margin: 0;
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .mobile-header {
+            display: flex;
+        }
+        
+        .main-chat {
+            border-radius: 0;
+            flex: 1;
+            width: 100%;
+        }
+        
+        .chat-header {
+            display: none;
+        }
+        
+        .matscichat-messages-container {
+            padding: 15px;
+        }
+        
+        .matscichat-message {
+            gap: 8px;
+        }
+        
+        .matscichat-message-avatar {
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
+        }
+        
+        .matscichat-message-content {
+            max-width: calc(100vw - 100px);
+            font-size: 14px;
+        }
+        
+        .input-container {
+            padding: 12px;
+        }
+        
+        .input-wrapper {
+            gap: 8px;
+        }
+        
+        #matscichat-message-input {
+            padding: 10px 14px;
+            font-size: 12px; /* Prevents zoom on iOS */
+        }
+        
+        #matscichat-send-btn {
+            padding: 10px 16px;
+            font-size: 14px;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+        }
+        
+        .empty-state p {
+            font-size: 14px;
+            padding: 0 20px;
+        }
+        
+        .new-chat-btn {
+            font-size: 15px;
+            padding: 10px;
+        }
+        
+        .chat-session {
+            padding: 10px;
+        }
+        
+        .chat-session-title {
+            font-size: 13px;
+        }
+        
+        .chat-session-date {
+            font-size: 11px;
+        }
+
+        /* Hide the text, show the icon */
+        #matscichat-send-btn #chat-submit-btn-text {
+            display: none;
+        }
+        
+        #matscichat-send-btn #chat-submit-btn-icon {
+            display: inline; /* or block, depending on your layout */
+        }
+    }
+    
+    @media screen and (max-width: 480px) {
+        .matscichat-message-content {
+            max-width: calc(100vw - 80px);
+        }
+        
+        #matscichat-send-btn {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+        
+        .sidebar {
+            width: 85%;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -324,42 +504,54 @@ MatSciChat - Materials Science Assistant
 
 {% block body %}
 <main>
-    <div class="chat-container">
-        <div class="sidebar">
-            <h3>Chat History</h3>
-            <button class="new-chat-btn" onclick="createNewChat()">+ New Chat</button>
-            <div id="chat-sessions"></div>
+<div class="container">
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="chat-container">
+    <div class="sidebar" id="sidebar">
+        <h3>Chat History</h3>
+        <button class="new-chat-btn" onclick="createNewChat()">+ New Chat</button>
+        <div id="chat-sessions"></div>
+    </div>
+    
+    <div class="main-chat">
+        <div class="mobile-header">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <h2>MatSciChat</h2>
         </div>
         
-        <div class="main-chat">
-            <div class="chat-header">
-                <h2>MatSciChat</h2>
+        <div class="chat-header">
+            <h2>MatSciChat</h2>
+        </div>
+        
+        <div class="matscichat-messages-container" id="matscichat-messages">
+            <div class="empty-state">
+                <h3>👋 Welcome to MatSciChat!</h3>
+                <p>Your intelligent materials science assistant. Ask me about material properties, comparisons, predictions, and more.</p>
+                <p>...</p>
+                <p>Try : "Compare steel and aluminum compatibility in terms of sea water usage. Which will corrode faster?" just to see the functionality.</p>
+                <p>...</p>
+                <p>Because we have only two materials in our tiny database. We are only limited to one query only due to our low server specs. 😓 Please donate or contact admin.</p>
             </div>
-            
-            <div class="matscichat-messages-container" id="matscichat-messages">
-                <div class="empty-state">
-                    <h3>👋 Welcome to MatSciChat!</h3>
-                    <p>Your intelligent materials science assistant. Ask me about material properties, comparisons, predictions, and more.</p>
-                    <p>...</p>
-                    <p>Try : "Compare steel and aluminum compatibility in terms of sea water usage. Which will corrode faster?" just to see the functionality.</p>
-                    <p>...</p>
-                    <p>Because we have only two materials in our tiny database. We are only limited to one query only due to our low server specs. 😓 Please donate or contact admin.</p>
-                </div>
-            </div>
-            
-            <div class="input-container">
-                <div class="input-wrapper">
-                    <input 
-                        type="text" 
-                        id="matscichat-message-input" 
-                        placeholder="Ask me about materials science..."
-                        onkeypress="handleKeyPress(event)"
-                    >
-                    <button id="matscichat-send-btn" onclick="sendMessage()">Send</button>
-                </div>
+        </div>
+        
+        <div class="input-container">
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    id="matscichat-message-input" 
+                    placeholder="Ask me about materials science..."
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button id="matscichat-send-btn" onclick="sendMessage()">
+                    <span id="chat-submit-btn-text">Send</span>
+                    <i class="fa fa-paper-plane" id="chat-submit-btn-icon" aria-hidden="true"></i>
+                </button>
             </div>
         </div>
     </div>
+</div>
+</div>
 </main>
 {% endblock %}
 
@@ -371,7 +563,35 @@ let isStreaming = false;
 // Load chat sessions on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadChatSessions();
+    
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+        const sidebar = document.getElementById('sidebar');
+        const menuBtn = document.querySelector('.menu-btn');
+        if (window.innerWidth <= 768 && 
+            sidebar.classList.contains('active') && 
+            !sidebar.contains(e.target) && 
+            !menuBtn.contains(e.target)) {
+            toggleSidebar();
+        }
+    });
 });
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
+
+function closeSidebarOnMobile() {
+    if (window.innerWidth <= 768) {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+    }
+}
 
 async function loadChatSessions() {
     try {
@@ -430,6 +650,12 @@ async function createNewChat() {
         // Reload sessions
         loadChatSessions();
         
+        // Close sidebar on mobile
+        closeSidebarOnMobile();
+        
+        // Focus input
+        document.getElementById('matscichat-message-input').focus();
+        
     } catch (error) {
         console.error('Error creating session:', error);
     }
@@ -443,6 +669,9 @@ async function loadChatSession(sessionId) {
         el.classList.remove('active');
     });
     event.currentTarget.classList.add('active');
+    
+    // Close sidebar on mobile after selection
+    closeSidebarOnMobile();
     
     try {
         const response = await fetch(`/matscichat/sessions/${sessionId}/`);
