@@ -105,9 +105,118 @@ class Profile(models.Model):
     def __str__(self):
         return f"Profile of {self.full_name} - ({self.user.email})"
 
+
+
 # ===========================================
-# Material's Database Models
+# Resources
 # ===========================================
+
+class Resource(models.Model):
+    """Model for books and software resources"""
+    
+    RESOURCE_TYPE_CHOICES = [
+        ('book', 'Book'),
+        ('software', 'Software'),
+    ]
+    
+    # Basic Information
+    title = models.CharField(max_length=300)
+    resource_type = models.CharField(max_length=20, choices=RESOURCE_TYPE_CHOICES, db_index=True)
+    author = models.CharField(max_length=200, blank=True, help_text="Author name or organization")
+    
+    # File
+    file = models.FileField(
+        upload_to='resources/%Y/%m/',
+        help_text="PDF for books, ZIP for software"
+    )
+    
+    # Thumbnail/Cover
+    thumbnail = models.ImageField(
+        upload_to='resources/thumbnails/',
+        blank=True,
+        null=True,
+        help_text="Cover image for book or software icon"
+    )
+    
+    # Content
+    description = models.TextField(
+        blank=True,
+        help_text="Description for books (plain text or markdown)"
+    )
+    
+    guideline = models.TextField(
+        blank=True,
+        help_text="Installation/usage guideline for software (markdown supported)"
+    )
+    
+    # Metadata
+    category = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="e.g., Materials Science, Simulation, Analysis"
+    )
+    tags = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text="Comma-separated tags"
+    )
+    version = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Version number (for software)"
+    )
+    
+    # Statistics
+    file_size = models.BigIntegerField(
+        default=0,
+        help_text="File size in bytes"
+    )
+    download_count = models.IntegerField(default=0)
+    
+    # Publishing
+    uploaded_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='uploaded_resources'
+    )
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        ordering = ['-uploaded_at']
+        indexes = [
+            models.Index(fields=['resource_type', 'is_active']),
+            models.Index(fields=['category']),
+        ]
+    
+    def __str__(self):
+        return f"{self.title} ({self.get_resource_type_display()})"
+    
+    def get_file_size_display(self):
+        """Return human-readable file size"""
+        size = self.file_size
+        for unit in ['B', 'KB', 'MB', 'GB']:
+            if size < 1024.0:
+                return f"{size:.1f} {unit}"
+            size /= 1024.0
+        return f"{size:.1f} TB"
+    
+    def increment_download_count(self):
+        """Increment download counter"""
+        self.download_count += 1
+        self.save(update_fields=['download_count'])
+    
+    def get_tags_list(self):
+        """Return tags as a list"""
+        if self.tags:
+            return [tag.strip() for tag in self.tags.split(',')]
+        return []
+
+
+
 
 # ===========================================
 # Press Releases
@@ -139,12 +248,12 @@ class PressRelease(models.Model):
 class Career(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    key_responsibilities = models.TextField(blank=True, help_text="Comma-separated list of key responsibilities")
-    qualifications = models.TextField(blank=True, help_text="Comma-separated list of required qualifications")
-    compensation = models.TextField(blank=True, help_text="e.g., Salary range, benefits")
-    location = models.CharField(max_length=255, blank=True)
+    key_responsibilities = models.TextField(blank=True, help_text="HTML supported")
+    qualifications = models.TextField(blank=True, help_text="HTML supported")
+    compensation = models.TextField(blank=True, help_text="HTML supported")
+    location = models.CharField(max_length=255, blank=True, help_text="e.g., Remote, Urgent")
     job_type = models.CharField(max_length=100, blank=True, help_text="e.g., Engineering, Research, Marketing")
-    employment_type = models.CharField(max_length=50, blank=True, help_text="e.g., Remote, Urgent")
+    employment_type = models.CharField(max_length=50, blank=True, help_text="e.g., Full-time, Part-time, Contract")
     created_at = models.DateTimeField(auto_now_add=True)
     application_deadline = models.CharField(max_length=255, blank=True)
     job_tags = models.TextField(blank=True, help_text="Comma-separated list of job tags (e.g., Python, ML, Data Science)")

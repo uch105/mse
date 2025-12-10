@@ -47,9 +47,9 @@
                 </a>
                 
                 <div class="nav-links">
-                    <a href="{% url 'materials' %}">Materials</a>
-                    <a href="{% url 'matscichat' %}">MatSciChat</a>
-                    <a href="{% url 'resources' %}">Resources</a>
+                    <a href="{% url 'materials:home' %}">Materials</a>
+                    <a href="{% url 'chat' %}">MatSciChat</a>
+                    <a href="{% url 'resources_home' %}">Resources</a>
                     <a href="{% url 'forum:feed' %}">Forum</a>
                 </div>
 
@@ -95,9 +95,9 @@
                 <div class="footer-column">
                     <h3>Explore</h3>
                     <ul>
-                        <li><a href="{% url 'materials' %}">Materials Database</a></li>
-                        <li><a href="{% url 'matscichat' %}">MatSciChat</a></li>
-                        <li><a href="{% url 'resources' %}">Resources</a></li>
+                        <li><a href="{% url 'materials:home' %}">Materials Database</a></li>
+                        <li><a href="{% url 'chat' %}">MatSciChat</a></li>
+                        <li><a href="{% url 'resources_home' %}">Resources</a></li>
                         <li><a href="{% url 'forum:feed' %}">Forum</a></li>
                     </ul>
                 </div>

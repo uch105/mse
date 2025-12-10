@@ -1,0 +1,464 @@
+
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+{{ resource.title }} - Resources
+{% endblock %}
+
+{% block meta_links %}
+<style>
+    .resource-detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #007bff;
+        text-decoration: none;
+        font-size: 16px;
+    }
+    
+    .back-link:hover {
+        text-decoration: underline;
+    }
+    
+    .resource-header {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    
+    .header-content {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 30px;
+        padding: 30px;
+    }
+    
+    .resource-thumbnail-large {
+        width: 100%;
+        height: 400px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 120px;
+        color: white;
+    }
+    
+    .resource-thumbnail-large img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    
+    .resource-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .resource-type-badge {
+        display: inline-block;
+        padding: 6px 16px;
+        background: #007bff;
+        color: white;
+        border-radius: 16px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        width: fit-content;
+    }
+    
+    .resource-type-badge.software {
+        background: #28a745;
+    }
+    
+    .resource-title {
+        font-size: 36px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 15px;
+        line-height: 1.2;
+    }
+    
+    .resource-author {
+        font-size: 20px;
+        color: #666;
+        margin-bottom: 20px;
+    }
+    
+    .resource-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .meta-item {
+        text-align: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .meta-label {
+        font-size: 12px;
+        color: #999;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+    
+    .meta-value {
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .download-section {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .download-btn {
+        flex: 1;
+        padding: 15px 30px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+    }
+    
+    .download-btn:hover {
+        background: #0056b3;
+    }
+    
+    .tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .tag {
+        padding: 6px 14px;
+        background: #e3f2fd;
+        color: #007bff;
+        border-radius: 16px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    
+    /* Content Section */
+    .content-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .section-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #007bff;
+    }
+    
+    .content-text {
+        font-size: 16px;
+        line-height: 1.8;
+        color: #555;
+    }
+    
+    /* Markdown styling for guideline */
+    .markdown-content h1,
+    .markdown-content h2,
+    .markdown-content h3 {
+        margin-top: 24px;
+        margin-bottom: 16px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .markdown-content h1 { font-size: 28px; }
+    .markdown-content h2 { font-size: 24px; }
+    .markdown-content h3 { font-size: 20px; }
+    
+    .markdown-content p {
+        margin-bottom: 16px;
+        line-height: 1.8;
+    }
+    
+    .markdown-content ul,
+    .markdown-content ol {
+        margin-bottom: 16px;
+        padding-left: 30px;
+    }
+    
+    .markdown-content li {
+        margin-bottom: 8px;
+    }
+    
+    .markdown-content code {
+        background: #f5f5f5;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        color: #e83e8c;
+    }
+    
+    .markdown-content pre {
+        background: #f5f5f5;
+        padding: 16px;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin-bottom: 16px;
+    }
+    
+    .markdown-content pre code {
+        background: none;
+        padding: 0;
+        color: #333;
+    }
+    
+    .markdown-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 16px;
+    }
+    
+    .markdown-content th,
+    .markdown-content td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+    
+    .markdown-content th {
+        background: #f8f9fa;
+        font-weight: 600;
+    }
+    
+    /* Related Resources */
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .related-card {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+        cursor: pointer;
+    }
+    
+    .related-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .related-thumbnail {
+        width: 100%;
+        height: 150px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        color: white;
+    }
+    
+    .related-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .related-content {
+        padding: 15px;
+    }
+    
+    .related-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+    
+    .related-author {
+        font-size: 13px;
+        color: #666;
+    }
+    
+    @media screen and (max-width: 768px) {
+        .resource-detail-container {
+            padding: 15px;
+        }
+        
+        .header-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .resource-thumbnail-large {
+            height: 300px;
+        }
+        
+        .resource-title {
+            font-size: 28px;
+        }
+        
+        .resource-meta-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .download-section {
+            flex-direction: column;
+        }
+        
+        .related-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block head_scripts %}
+{% endblock %}
+
+{% block body %}
+<main>
+    <div class="container">
+        <div class="resource-detail-container">
+            <a href="{% url 'resources_home' %}" class="back-link">← Back to Resources</a>
+            
+            <div class="resource-header">
+                <div class="header-content">
+                    <div class="resource-thumbnail-large">
+                        {% if resource.thumbnail %}
+                            <img src="{{ resource.thumbnail.url }}" alt="{{ resource.title }}">
+                        {% else %}
+                            {% if resource.resource_type == 'book' %}📖{% else %}💻{% endif %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="resource-info">
+                        <div>
+                            <span class="resource-type-badge {% if resource.resource_type == 'software' %}software{% endif %}">
+                                {{ resource.get_resource_type_display }}
+                            </span>
+                            <h1 class="resource-title">{{ resource.title }}</h1>
+                            {% if resource.author %}
+                                <div class="resource-author">by {{ resource.author }}</div>
+                            {% endif %}
+                            
+                            <div class="resource-meta-grid">
+                                <div class="meta-item">
+                                    <div class="meta-label">Downloads</div>
+                                    <div class="meta-value">{{ resource.download_count }}</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="meta-label">File Size</div>
+                                    <div class="meta-value">{{ resource.get_file_size_display }}</div>
+                                </div>
+                                {% if resource.version %}
+                                <div class="meta-item">
+                                    <div class="meta-label">Version</div>
+                                    <div class="meta-value">{{ resource.version }}</div>
+                                </div>
+                                {% else %}
+                                <div class="meta-item">
+                                    <div class="meta-label">Category</div>
+                                    <div class="meta-value">{{ resource.category|default:"General" }}</div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            {% if resource.tags %}
+                                <div class="tags-container">
+                                    {% for tag in resource.get_tags_list %}
+                                        <span class="tag">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="download-section">
+                            <a href="{% url 'resource_download' resource.id %}" class="download-btn">
+                                📥 Download {{ resource.get_resource_type_display }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Description (for books) or Guideline (for software) -->
+            {% if resource.resource_type == 'book' and description_html %}
+                <div class="content-section">
+                    <h2 class="section-title">📖 Description</h2>
+                    <div class="content-text markdown-content">
+                        {{ description_html|safe }}
+                    </div>
+                </div>
+            {% elif resource.resource_type == 'software' and guideline_html %}
+                <div class="content-section">
+                    <h2 class="section-title">📋 Installation & Usage Guide</h2>
+                    <div class="markdown-content">
+                        {{ guideline_html|safe }}
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Related Resources -->
+            {% if related %}
+                <div class="content-section">
+                    <h2 class="section-title">Related {{ resource.get_resource_type_display }}s</h2>
+                    <div class="related-grid">
+                        {% for rel in related %}
+                        <div class="related-card" onclick="window.location.href=`{% url 'resource_detail' rel.id %}`">
+                            <div class="related-thumbnail">
+                                {% if rel.thumbnail %}
+                                    <img src="{{ rel.thumbnail.url }}" alt="{{ rel.title }}">
+                                {% else %}
+                                    {% if rel.resource_type == 'book' %}📖{% else %}💻{% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="related-content">
+                                <div class="related-title">{{ rel.title }}</div>
+                                {% if rel.author %}
+                                    <div class="related-author">{{ rel.author }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block body_scripts %}
+{% endblock %}

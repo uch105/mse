@@ -1,8 +1,13 @@
 from django.urls import path
-from . import views
+from materials import views
+
+app_name = 'materials'
 
 urlpatterns = [
-    path('', views.materials, name='materials'),
+    path('', views.materials_home, name='home'),
+    path('search/', views.search_materials, name='search'),
+    path('<int:material_id>/', views.material_detail, name='detail'),
+    path('element/<str:symbol>/', views.element_detail, name='element_detail'),
 ]
 
 from django.urls import re_path

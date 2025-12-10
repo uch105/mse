@@ -13,6 +13,88 @@ admin.site.register(CareerApplication)
 admin.site.register(PressRelease)
 admin.site.register(TeamMember)
 
+# ==========================================
+# Resource model admin registrations
+# ==========================================
+
+# Add this to your existing core/admin.py file
+
+@admin.register(Resource)
+class ResourceAdmin(admin.ModelAdmin):
+    list_display = [
+        'title', 
+        'resource_type', 
+        'author', 
+        'category',
+        'version',
+        'download_count',
+        'file_size_display',
+        'is_active',
+        'uploaded_at'
+    ]
+    
+    list_filter = [
+        'resource_type',
+        'category',
+        'is_active',
+        'uploaded_at'
+    ]
+    
+    search_fields = [
+        'title',
+        'author',
+        'description',
+        'guideline',
+        'tags'
+    ]
+    
+    readonly_fields = [
+        'download_count',
+        'uploaded_at',
+        'updated_at',
+        'file_size_display'
+    ]
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('title', 'resource_type', 'author', 'category')
+        }),
+        ('Files', {
+            'fields': ('file', 'thumbnail', 'file_size')
+        }),
+        ('Content', {
+            'fields': ('description', 'guideline'),
+            'description': 'Use description for books, guideline for software (supports markdown)'
+        }),
+        ('Metadata', {
+            'fields': ('tags', 'version'),
+            'classes': ('collapse',)
+        }),
+        ('Statistics', {
+            'fields': ('download_count', 'file_size_display'),
+            'classes': ('collapse',)
+        }),
+        ('Publishing', {
+            'fields': ('uploaded_by', 'is_active', 'uploaded_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def file_size_display(self, obj):
+        return obj.get_file_size_display()
+    file_size_display.short_description = 'File Size'
+    
+    def save_model(self, request, obj, form, change):
+        # Auto-set file size if file is uploaded
+        if obj.file:
+            obj.file_size = obj.file.size
+        
+        # Auto-set uploaded_by if not set
+        if not obj.uploaded_by:
+            obj.uploaded_by = request.user
+        
+        super().save_model(request, obj, form, change)
+
 
 
 # ==========================================

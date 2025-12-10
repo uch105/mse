@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from core import views
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -20,7 +20,11 @@ urlpatterns = [
     path('press/<int:pk>/', views.press, name='press'),
     path('privacy-policy/', views.privacy, name='privacy'),
     path('terms-and-conditions/', views.terms, name='terms'),
-    path('resources/', views.resources, name='resources'),
+    path('resources/', views.resources_home, name='resources_home'),
+    path('resources/books/', views.resources_books, name='resources_books'),
+    path('resources/software/', views.resources_software, name='resources_software'),
+    path('resources/<int:resource_id>/', views.resource_detail, name='resource_detail'),
+    path('resources/<int:resource_id>/download/', views.resource_download, name='resource_download'),
     path('api-docs/', views.apidocs, name='api-docs'),
     path('pricing/', views.pricing, name='pricing'),
     path('checkout/', views.checkout, name='checkout'),

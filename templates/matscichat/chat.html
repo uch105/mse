@@ -1,0 +1,644 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+MatSciChat - Materials Science Assistant
+{% endblock %}
+
+{% block meta_links %}
+<style>
+    .chat-container {
+        display: flex;
+        height: calc(100vh - 200px);
+        max-width: 1600px;
+        margin: 0 auto;
+        gap: 20px;
+        padding: 20px;
+    }
+    
+    .sidebar {
+        width: 280px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        overflow-y: auto;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .sidebar h3 {
+        margin: 0 0 15px 0;
+        font-size: 18px;
+        color: #333;
+    }
+    
+    .new-chat-btn {
+        width: 100%;
+        padding: 12px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        transition: background 0.2s;
+    }
+    
+    .new-chat-btn:hover {
+        background: #0056b3;
+    }
+    
+    .chat-session {
+        padding: 12px;
+        margin-bottom: 8px;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 2px solid transparent;
+    }
+    
+    .chat-session:hover {
+        background: #e9ecef;
+    }
+    
+    .chat-session.active {
+        border-color: #007bff;
+        background: #e7f3ff;
+    }
+    
+    .chat-session-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .chat-session-date {
+        font-size: 12px;
+        color: #666;
+    }
+    
+    .delete-session {
+        float: right;
+        color: #dc3545;
+        font-size: 18px;
+        padding: 0 4px;
+        display: none;
+    }
+    
+    .chat-session:hover .delete-session {
+        display: inline;
+    }
+    
+    .main-chat {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .chat-header {
+        padding: 20px;
+        border-bottom: 1px solid #e0e0e0;
+        background: #f8f9fa;
+    }
+    
+    .chat-header h2 {
+        margin: 0;
+        font-size: 24px;
+        color: #333;
+    }
+    
+    .matscichat-messages-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background: #ffffff;
+    }
+    
+    .matscichat-message {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 12px;
+        animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .matscichat-message-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .matscichat-user-avatar {
+        background: #007bff;
+    }
+    
+    .matscichat-assistant-avatar {
+        background: #28a745;
+    }
+    
+    .matscichat-message-content {
+        flex: 1;
+        max-width: 1200px;
+    }
+    
+    .matscichat-message.user .matscichat-message-content {
+        background: #007bff;
+        color: white;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border-top-left-radius: 4px;
+    }
+    
+    .matscichat-message.assistant .matscichat-message-content {
+        background: #f8f9fa;
+        color: #333;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border-top-left-radius: 4px;
+    }
+    
+    .matscichat-message-time {
+        font-size: 11px;
+        color: #999;
+        margin-top: 4px;
+    }
+    
+    .matscichat-typing-indicator {
+        display: none;
+        padding: 12px 16px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        width: fit-content;
+    }
+    
+    .matscichat-typing-indicator.active {
+        display: block;
+    }
+    
+    .matscichat-typing-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #999;
+        margin: 0 2px;
+        animation: typing 1.4s infinite;
+    }
+    
+    .matscichat-typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .matscichat-typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes typing {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-10px); }
+    }
+    
+    .input-container {
+        padding: 20px;
+        border-top: 1px solid #e0e0e0;
+        background: #f8f9fa;
+    }
+    
+    .input-wrapper {
+        display: flex;
+        gap: 12px;
+    }
+    
+    #matscichat-message-input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 24px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    
+    #matscichat-message-input:focus {
+        border-color: #007bff;
+    }
+    
+    #matscichat-send-btn {
+        padding: 12px 24px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 24px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: background 0.2s;
+    }
+    
+    #matscichat-send-btn:hover:not(:disabled) {
+        background: #0056b3;
+    }
+    
+    #matscichat-send-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+    
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #666;
+        text-align: center;
+    }
+    
+    .empty-state h3 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+        font-size: 16px;
+        max-width: 500px;
+    }
+    
+    /* Markdown styling */
+    .matscichat-message-content h2 {
+        font-size: 18px;
+        margin: 16px 0 8px 0;
+        color: #333;
+    }
+    
+    .matscichat-message-content h3 {
+        font-size: 16px;
+        margin: 12px 0 6px 0;
+        color: #444;
+    }
+    
+    .matscichat-message-content ul {
+        margin: 8px 0;
+        padding-left: 20px;
+    }
+    
+    .matscichat-message-content li {
+        margin: 4px 0;
+    }
+    
+    .matscichat-message-content strong {
+        font-weight: 600;
+    }
+    
+    .matscichat-message-content code {
+        background: #f0f0f0;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: monospace;
+    }
+</style>
+{% endblock %}
+
+{% block head_scripts %}
+{% endblock %}
+
+{% block body %}
+<main>
+    <div class="chat-container">
+        <div class="sidebar">
+            <h3>Chat History</h3>
+            <button class="new-chat-btn" onclick="createNewChat()">+ New Chat</button>
+            <div id="chat-sessions"></div>
+        </div>
+        
+        <div class="main-chat">
+            <div class="chat-header">
+                <h2>MatSciChat</h2>
+            </div>
+            
+            <div class="matscichat-messages-container" id="matscichat-messages">
+                <div class="empty-state">
+                    <h3>👋 Welcome to MatSciChat!</h3>
+                    <p>Your intelligent materials science assistant. Ask me about material properties, comparisons, predictions, and more.</p>
+                    <p>...</p>
+                    <p>Try : "Compare steel and aluminum compatibility in terms of sea water usage. Which will corrode faster?" just to see the functionality.</p>
+                    <p>...</p>
+                    <p>Because we have only two materials in our tiny database. We are only limited to one query only due to our low server specs. 😓 Please donate or contact admin.</p>
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="matscichat-message-input" 
+                        placeholder="Ask me about materials science..."
+                        onkeypress="handleKeyPress(event)"
+                    >
+                    <button id="matscichat-send-btn" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+let currentSessionId = null;
+let isStreaming = false;
+
+// Load chat sessions on page load
+document.addEventListener('DOMContentLoaded', () => {
+    loadChatSessions();
+});
+
+async function loadChatSessions() {
+    try {
+        const response = await fetch('/matscichat/sessions/');
+        const data = await response.json();
+        
+        const container = document.getElementById('chat-sessions');
+        container.innerHTML = '';
+        
+        if (data.sessions.length === 0) {
+            container.innerHTML = '<p style="color: #999; font-size: 14px;">No chat history yet</p>';
+            return;
+        }
+        
+        data.sessions.forEach(session => {
+            const div = document.createElement('div');
+            div.className = 'chat-session';
+            div.onclick = () => loadChatSession(session.id);
+            
+            const date = new Date(session.updated_at).toLocaleDateString();
+            
+            div.innerHTML = `
+                <span class="delete-session" onclick="event.stopPropagation(); deleteSession(${session.id})">&times;</span>
+                <div class="chat-session-title">${session.title}</div>
+                <div class="chat-session-date">${date}</div>
+            `;
+            
+            container.appendChild(div);
+        });
+    } catch (error) {
+        console.error('Error loading sessions:', error);
+    }
+}
+
+async function createNewChat() {
+    try {
+        const response = await fetch('/matscichat/sessions/create/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        });
+        
+        const data = await response.json();
+        currentSessionId = data.id;
+        
+        // Clear messages
+        const messagesDiv = document.getElementById('matscichat-messages');
+        messagesDiv.innerHTML = `
+            <div class="empty-state">
+                <h3>👋 New Chat Started!</h3>
+                <p>Ask me anything about materials science.</p>
+            </div>
+        `;
+        
+        // Reload sessions
+        loadChatSessions();
+        
+    } catch (error) {
+        console.error('Error creating session:', error);
+    }
+}
+
+async function loadChatSession(sessionId) {
+    currentSessionId = sessionId;
+    
+    // Update active state
+    document.querySelectorAll('.chat-session').forEach(el => {
+        el.classList.remove('active');
+    });
+    event.currentTarget.classList.add('active');
+    
+    try {
+        const response = await fetch(`/matscichat/sessions/${sessionId}/`);
+        const data = await response.json();
+        
+        const messagesDiv = document.getElementById('matscichat-messages');
+        messagesDiv.innerHTML = '';
+        
+        data.messages.forEach(msg => {
+            displayMessage(msg.content, msg.role);
+        });
+        
+        scrollToBottom();
+        
+    } catch (error) {
+        console.error('Error loading messages:', error);
+    }
+}
+
+async function deleteSession(sessionId) {
+    if (!confirm('Delete this chat?')) return;
+    
+    try {
+        await fetch(`/matscichat/sessions/${sessionId}/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        });
+        
+        if (currentSessionId === sessionId) {
+            currentSessionId = null;
+            document.getElementById('matscichat-messages').innerHTML = `
+                <div class="empty-state">
+                    <h3>👋 Welcome to MatSciChat!</h3>
+                    <p>Your intelligent materials science assistant.</p>
+                </div>
+            `;
+        }
+        
+        loadChatSessions();
+        
+    } catch (error) {
+        console.error('Error deleting session:', error);
+    }
+}
+
+function handleKeyPress(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }
+}
+
+async function sendMessage() {
+    const input = document.getElementById('matscichat-message-input');
+    const message = input.value.trim();
+    
+    if (!message || isStreaming) return;
+    
+    // Create session if none exists
+    if (!currentSessionId) {
+        await createNewChat();
+    }
+    
+    // Clear input
+    input.value = '';
+    
+    // Display user message
+    displayMessage(message, 'user');
+    
+    // Show typing indicator
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'matscichat-message assistant';
+    typingDiv.innerHTML = `
+        <div class="matscichat-message-avatar matscichat-assistant-avatar">A</div>
+        <div class="matscichat-typing-indicator active">
+            <span class="matscichat-typing-dot"></span>
+            <span class="matscichat-typing-dot"></span>
+            <span class="matscichat-typing-dot"></span>
+        </div>
+    `;
+    document.getElementById('matscichat-messages').appendChild(typingDiv);
+    scrollToBottom();
+    
+    // Disable send button
+    isStreaming = true;
+    document.getElementById('matscichat-send-btn').disabled = true;
+    
+    try {
+        const response = await fetch('/matscichat/stream/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                message: message,
+                session_id: currentSessionId
+            })
+        });
+        
+        // Remove typing indicator
+        typingDiv.remove();
+        
+        // Create assistant message container
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'matscichat-message assistant';
+        messageDiv.innerHTML = `
+            <div class="matscichat-message-avatar matscichat-assistant-avatar">A</div>
+            <div class="matscichat-message-content"></div>
+        `;
+        document.getElementById('matscichat-messages').appendChild(messageDiv);
+        
+        const contentDiv = messageDiv.querySelector('.matscichat-message-content');
+        let fullContent = '';
+        
+        // Read the stream
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        
+        while (true) {
+            const {done, value} = await reader.read();
+            if (done) break;
+            
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n');
+            
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    const data = JSON.parse(line.substring(6));
+                    
+                    if (data.type === 'content') {
+                        fullContent += data.chunk;
+                        contentDiv.innerHTML = marked.parse(fullContent);
+                        scrollToBottom();
+                    }
+                }
+            }
+        }
+        
+    } catch (error) {
+        console.error('Error sending message:', error);
+        alert('Error sending message. Please try again.');
+    } finally {
+        isStreaming = false;
+        document.getElementById('matscichat-send-btn').disabled = false;
+        loadChatSessions(); // Refresh to show updated title
+    }
+}
+
+function displayMessage(content, role) {
+    const messagesDiv = document.getElementById('matscichat-messages');
+    
+    // Remove empty state if present
+    const emptyState = messagesDiv.querySelector('.empty-state');
+    if (emptyState) {
+        emptyState.remove();
+    }
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `matscichat-message ${role}`;
+    
+    const avatar = role === 'user' ? 'U' : 'A';
+    const avatarClass = role === 'user' ? 'matscichat-user-avatar' : 'matscichat-assistant-avatar';
+    
+    messageDiv.innerHTML = `
+        <div class="matscichat-message-avatar ${avatarClass}">${avatar}</div>
+        <div class="matscichat-message-content">${role === 'assistant' ? marked.parse(content) : content}</div>
+    `;
+    
+    messagesDiv.appendChild(messageDiv);
+    scrollToBottom();
+}
+
+function scrollToBottom() {
+    const messagesDiv = document.getElementById('matscichat-messages');
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
+<!-- Include marked.js for markdown parsing -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+{% endblock %}

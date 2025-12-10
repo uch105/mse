@@ -370,3 +370,181 @@ def pricing(request):
 def checkout(request):
     context = {}
     return render(request, 'core/checkout.html', context)
+
+
+# ========================================
+# Resource Views
+# ========================================
+
+# Add these views to your existing core/views.py file
+
+from django.shortcuts import get_object_or_404
+from django.http import FileResponse, Http404
+from django.db.models import Q
+
+
+def resources_home(request):
+    """Main resources page showing both books and software"""
+    query = request.GET.get('q', '').strip()
+    category = request.GET.get('category', '').strip()
+    
+    resources = Resource.objects.filter(is_active=True)
+    
+    # Search filter
+    if query:
+        resources = resources.filter(
+            Q(title__icontains=query) |
+            Q(author__icontains=query) |
+            Q(description__icontains=query) |
+            Q(tags__icontains=query)
+        )
+    
+    # Category filter
+    if category:
+        resources = resources.filter(category__iexact=category)
+    
+    # Get all categories for filter
+    categories = Resource.objects.filter(is_active=True).values_list('category', flat=True).distinct()
+    categories = [cat for cat in categories if cat]
+    
+    # Separate books and software
+    books = resources.filter(resource_type='book')[:6]
+    software = resources.filter(resource_type='software')[:6]
+    
+    context = {
+        'books': books,
+        'software': software,
+        'categories': categories,
+        'query': query,
+        'selected_category': category,
+    }
+    
+    return render(request, 'resources/home.html', context)
+
+
+def resources_books(request):
+    """Page showing all books"""
+    query = request.GET.get('q', '').strip()
+    category = request.GET.get('category', '').strip()
+    
+    books = Resource.objects.filter(is_active=True, resource_type='book')
+    
+    if query:
+        books = books.filter(
+            Q(title__icontains=query) |
+            Q(author__icontains=query) |
+            Q(description__icontains=query) |
+            Q(tags__icontains=query)
+        )
+    
+    if category:
+        books = books.filter(category__iexact=category)
+    
+    categories = Resource.objects.filter(
+        is_active=True, 
+        resource_type='book'
+    ).values_list('category', flat=True).distinct()
+    categories = [cat for cat in categories if cat]
+    
+    context = {
+        'books': books,
+        'categories': categories,
+        'query': query,
+        'selected_category': category,
+    }
+    
+    return render(request, 'resources/books.html', context)
+
+
+def resources_software(request):
+    """Page showing all software"""
+    query = request.GET.get('q', '').strip()
+    category = request.GET.get('category', '').strip()
+    
+    software = Resource.objects.filter(is_active=True, resource_type='software')
+    
+    if query:
+        software = software.filter(
+            Q(title__icontains=query) |
+            Q(author__icontains=query) |
+            Q(guideline__icontains=query) |
+            Q(tags__icontains=query)
+        )
+    
+    if category:
+        software = software.filter(category__iexact=category)
+    
+    categories = Resource.objects.filter(
+        is_active=True,
+        resource_type='software'
+    ).values_list('category', flat=True).distinct()
+    categories = [cat for cat in categories if cat]
+    
+    context = {
+        'software': software,
+        'categories': categories,
+        'query': query,
+        'selected_category': category,
+    }
+    
+    return render(request, 'resources/software.html', context)
+
+
+def resource_detail(request, resource_id):
+    """Detailed view of a resource"""
+    resource = get_object_or_404(Resource, id=resource_id, is_active=True)
+    
+    # Convert markdown to HTML for guideline (software)
+    guideline_html = None
+    if resource.resource_type == 'software' and resource.guideline:
+        guideline_html = markdown.markdown(
+            resource.guideline,
+            extensions=['fenced_code', 'codehilite', 'tables', 'nl2br']
+        )
+    
+    # Convert markdown to HTML for description if it contains markdown syntax
+    description_html = None
+    if resource.description:
+        description_html = markdown.markdown(
+            resource.description,
+            extensions=['fenced_code', 'codehilite', 'tables', 'nl2br']
+        )
+    
+    # Get related resources
+    related = Resource.objects.filter(
+        is_active=True,
+        resource_type=resource.resource_type
+    ).exclude(id=resource.id)
+    
+    if resource.category:
+        related = related.filter(category=resource.category)[:4]
+    else:
+        related = related[:4]
+    
+    context = {
+        'resource': resource,
+        'guideline_html': guideline_html,
+        'description_html': description_html,
+        'related': related,
+    }
+    
+    return render(request, 'resources/detail.html', context)
+
+
+def resource_download(request, resource_id):
+    """Handle resource download"""
+    resource = get_object_or_404(Resource, id=resource_id, is_active=True)
+    
+    try:
+        # Increment download count
+        resource.increment_download_count()
+        
+        # Serve the file
+        response = FileResponse(
+            resource.file.open('rb'),
+            as_attachment=True,
+            filename=resource.file.name.split('/')[-1]
+        )
+        return response
+    except Exception as e:
+        raise Http404("File not found")

@@ -1,0 +1,364 @@
+
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+Resources - Books & Software
+{% endblock %}
+
+{% block meta_links %}
+<style>
+    .resources-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .page-header h1 {
+        font-size: 42px;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .page-header p {
+        font-size: 18px;
+        color: #666;
+    }
+    
+    /* Search and Filter */
+    .search-filter-section {
+        display: flex;
+        gap: 15px;
+        max-width: 900px;
+        margin: 0 auto 40px;
+        flex-wrap: wrap;
+    }
+    
+    .search-input {
+        flex: 1;
+        min-width: 250px;
+        padding: 12px 20px;
+        font-size: 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 25px;
+        outline: none;
+    }
+    
+    .search-input:focus {
+        border-color: #007bff;
+    }
+    
+    .filter-select {
+        padding: 12px 20px;
+        font-size: 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 25px;
+        outline: none;
+        background: white;
+        cursor: pointer;
+    }
+    
+    .search-btn {
+        padding: 12px 30px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    
+    .search-btn:hover {
+        background: #0056b3;
+    }
+    
+    /* Section */
+    .resource-section {
+        margin-bottom: 60px;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    
+    .section-title {
+        font-size: 32px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .view-all-link {
+        color: #007bff;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    
+    .view-all-link:hover {
+        text-decoration: underline;
+    }
+    
+    /* Resource Grid */
+    .resource-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+    }
+    
+    .resource-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+    }
+    
+    .resource-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    
+    .resource-thumbnail {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 64px;
+    }
+    
+    .resource-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .resource-content {
+        padding: 20px;
+    }
+    
+    .resource-type-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #007bff;
+        color: white;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+    
+    .resource-type-badge.software {
+        background: #28a745;
+    }
+    
+    .resource-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        display: -webkit-box;
+        --webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .resource-author {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 12px;
+    }
+    
+    .resource-meta {
+        display: flex;
+        gap: 15px;
+        font-size: 13px;
+        color: #999;
+        padding-top: 12px;
+        border-top: 1px solid #f0f0f0;
+    }
+    
+    .resource-meta span {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .empty-state-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+    
+    @media screen and (max-width: 768px) {
+        .resources-container {
+            padding: 15px;
+        }
+        
+        .page-header h1 {
+            font-size: 32px;
+        }
+        
+        .search-filter-section {
+            flex-direction: column;
+        }
+        
+        .search-input {
+            min-width: 100%;
+        }
+        
+        .resource-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .section-title {
+            font-size: 24px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block head_scripts %}
+{% endblock %}
+
+{% block body %}
+<main>
+    <div class="container">
+        <div class="resources-container">
+            <div class="page-header">
+                <h1>📚 Resources</h1>
+                <p>Browse our collection of books and software for materials science</p>
+            </div>
+            
+            <!-- Search and Filter -->
+            <form method="get" class="search-filter-section">
+                <input 
+                    type="text" 
+                    name="q"
+                    class="search-input"
+                    placeholder="Search resources..."
+                    value="{{ query }}"
+                >
+                <select name="category" class="filter-select">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>
+                            {{ cat }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="search-btn">Search</button>
+            </form>
+            
+            <!-- Books Section -->
+            <div class="resource-section">
+                <div class="section-header">
+                    <h2 class="section-title">📖 Books</h2>
+                    <a href="{% url 'resources_books' %}" class="view-all-link">View All →</a>
+                </div>
+                
+                {% if books %}
+                    <div class="resource-grid">
+                        {% for book in books %}
+                        <div class="resource-card" onclick="window.location.href=`{% url 'resource_detail' book.id %}`">
+                            <div class="resource-thumbnail">
+                                {% if book.thumbnail %}
+                                    <img src="{{ book.thumbnail.url }}" alt="{{ book.title }}">
+                                {% else %}
+                                    📖
+                                {% endif %}
+                            </div>
+                            <div class="resource-content">
+                                <span class="resource-type-badge">Book</span>
+                                <div class="resource-title">{{ book.title }}</div>
+                                {% if book.author %}
+                                    <div class="resource-author">by {{ book.author }}</div>
+                                {% endif %}
+                                <div class="resource-meta">
+                                    <span>📥 {{ book.download_count }}</span>
+                                    <span>📦 {{ book.get_file_size_display }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📖</div>
+                        <h3>No books found</h3>
+                        <p>Check back later for new resources</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Software Section -->
+            <div class="resource-section">
+                <div class="section-header">
+                    <h2 class="section-title">💻 Software</h2>
+                    <a href="{% url 'resources_software' %}" class="view-all-link">View All →</a>
+                </div>
+                
+                {% if software %}
+                    <div class="resource-grid">
+                        {% for sw in software %}
+                        <div class="resource-card" onclick="window.location.href=`{% url 'resource_detail' sw.id %}`">
+                            <div class="resource-thumbnail">
+                                {% if sw.thumbnail %}
+                                    <img src="{{ sw.thumbnail.url }}" alt="{{ sw.title }}">
+                                {% else %}
+                                    💻
+                                {% endif %}
+                            </div>
+                            <div class="resource-content">
+                                <span class="resource-type-badge software">Software</span>
+                                <div class="resource-title">{{ sw.title }}</div>
+                                {% if sw.version %}
+                                    <div class="resource-author">Version {{ sw.version }}</div>
+                                {% endif %}
+                                <div class="resource-meta">
+                                    <span>📥 {{ sw.download_count }}</span>
+                                    <span>📦 {{ sw.get_file_size_display }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💻</div>
+                        <h3>No software found</h3>
+                        <p>Check back later for new resources</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block body_scripts %}
+{% endblock %}

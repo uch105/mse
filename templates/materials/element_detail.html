@@ -1,0 +1,239 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+{{ symbol }} - Element Materials
+{% endblock %}
+
+{% block meta_links %}
+<style>
+    .element-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #007bff;
+        text-decoration: none;
+        font-size: 16px;
+    }
+    
+    .back-link:hover {
+        text-decoration: underline;
+    }
+    
+    .element-header {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .element-symbol-large {
+        font-size: 72px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    
+    .element-header h1 {
+        font-size: 32px;
+        margin: 0;
+    }
+    
+    .materials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 25px;
+    }
+    
+    .material-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+        border-top: 4px solid #007bff;
+    }
+    
+    .material-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    
+    .material-card-header {
+        margin-bottom: 15px;
+    }
+    
+    .material-name {
+        font-size: 24px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+    
+    .material-category-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #e3f2fd;
+        color: #007bff;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    
+    .material-description {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.6;
+        margin: 15px 0;
+    }
+    
+    .material-properties {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .property-chip {
+        background: #f8f9fa;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        color: #555;
+    }
+    
+    .property-chip strong {
+        color: #333;
+    }
+    
+    .no-materials {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .no-materials-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+    
+    .no-materials h2 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .no-materials p {
+        font-size: 16px;
+        color: #666;
+    }
+    
+    @media screen and (max-width: 768px) {
+        .element-container {
+            padding: 15px;
+        }
+        
+        .element-header {
+            padding: 25px;
+        }
+        
+        .element-symbol-large {
+            font-size: 48px;
+        }
+        
+        .element-header h1 {
+            font-size: 24px;
+        }
+        
+        .materials-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block head_scripts %}
+{% endblock %}
+
+{% block body %}
+<main>
+    <div class="container">
+        <div class="element-container">
+            <a href="{% url 'materials:home' %}" class="back-link">← Back to Periodic Table</a>
+            
+            <div class="element-header">
+                <div class="element-symbol-large">{{ symbol }}</div>
+                <h1>Materials containing {{ symbol }}</h1>
+            </div>
+            
+            {% if materials %}
+                <div class="materials-grid">
+                    {% for material in materials %}
+                    <div class="material-card" onclick="window.location.href=`{% url 'materials:detail' material.id %}`">
+                        <div class="material-card-header">
+                            <div class="material-name">{{ material.name }}</div>
+                            <span class="material-category-badge">{{ material.category }}</span>
+                        </div>
+                        
+                        {% if material.description %}
+                            <div class="material-description">
+                                {{ material.description|truncatewords:30 }}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="material-properties">
+                            {% if material.density %}
+                                <span class="property-chip">
+                                    <strong>Density:</strong> {{ material.density }} g/cm³
+                                </span>
+                            {% endif %}
+                            
+                            {% if material.tensile_strength %}
+                                <span class="property-chip">
+                                    <strong>Strength:</strong> {{ material.tensile_strength }} MPa
+                                </span>
+                            {% endif %}
+                            
+                            {% if material.melting_point %}
+                                <span class="property-chip">
+                                    <strong>Melting Pt:</strong> {{ material.melting_point }} °C
+                                </span>
+                            {% endif %}
+                            
+                            {% if material.corrosion_resistance_score %}
+                                <span class="property-chip">
+                                    <strong>Corrosion:</strong> {{ material.corrosion_resistance_score }}/10
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-materials">
+                    <div class="no-materials-icon">🔍</div>
+                    <h2>No Materials Found</h2>
+                    <p>We don't have any materials containing {{ symbol }} in our database yet.</p>
+                    <p style="margin-top: 20px;">
+                        <a href="{% url 'materials:home' %}" style="color: #007bff; text-decoration: none; font-weight: 600;">
+                            ← Return to explore other elements
+                        </a>
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block body_scripts %}
+{% endblock %}

@@ -1,0 +1,327 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+{{ material.name }} - Material Details
+{% endblock %}
+
+{% block meta_links %}
+<style>
+    .material-detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #007bff;
+        text-decoration: none;
+        font-size: 16px;
+    }
+    
+    .back-link:hover {
+        text-decoration: underline;
+    }
+    
+    .material-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+    }
+    
+    .material-header h1 {
+        font-size: 42px;
+        margin: 0 0 10px 0;
+    }
+    
+    .material-category {
+        display: inline-block;
+        background: rgba(255,255,255,0.3);
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+    
+    .material-description {
+        font-size: 18px;
+        line-height: 1.6;
+        opacity: 0.95;
+    }
+    
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .card-title {
+        font-size: 22px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #007bff;
+    }
+    
+    .property-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .property-item {
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .property-item:last-child {
+        border-bottom: none;
+    }
+    
+    .property-label {
+        font-weight: 500;
+        color: #555;
+    }
+    
+    .property-value {
+        font-weight: 600;
+        color: #333;
+        text-align: right;
+    }
+    
+    .full-width-card {
+        grid-column: 1 / -1;
+    }
+    
+    .compatibility-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 15px;
+    }
+    
+    .compatibility-item {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+    }
+    
+    .compat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .compat-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 16px;
+    }
+    
+    .compat-score {
+        background: #007bff;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    
+    .compat-score.high { background: #28a745; }
+    .compat-score.medium { background: #ffc107; color: #333; }
+    .compat-score.low { background: #dc3545; }
+    
+    .compat-behavior {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.5;
+    }
+    
+    .no-data {
+        text-align: center;
+        padding: 30px;
+        color: #999;
+        font-style: italic;
+    }
+    
+    @media screen and (max-width: 768px) {
+        .material-detail-container {
+            padding: 15px;
+        }
+        
+        .material-header {
+            padding: 25px;
+        }
+        
+        .material-header h1 {
+            font-size: 32px;
+        }
+        
+        .content-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .compatibility-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block head_scripts %}
+{% endblock %}
+
+{% block body %}
+<main>
+<div class="container">
+<div class="material-detail-container">
+    <a href="{% url 'materials:home' %}" class="back-link">← Back to Materials</a>
+    
+    <div class="material-header">
+        <span class="material-category">{{ material.category }}</span>
+        <h1>{{ material.name }}</h1>
+        {% if material.other_names %}
+            <p style="opacity: 0.9; margin: 5px 0 15px 0;">Also known as: {{ material.other_names }}</p>
+        {% endif %}
+        {% if material.description %}
+            <p class="material-description">{{ material.description }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="content-grid">
+        <!-- Key Properties -->
+        <div class="info-card">
+            <h2 class="card-title">Key Properties</h2>
+            <ul class="property-list">
+                {% if material.density %}
+                <li class="property-item">
+                    <span class="property-label">Density</span>
+                    <span class="property-value">{{ material.density }} g/cm³</span>
+                </li>
+                {% endif %}
+                
+                {% if material.tensile_strength %}
+                <li class="property-item">
+                    <span class="property-label">Tensile Strength</span>
+                    <span class="property-value">{{ material.tensile_strength }} MPa</span>
+                </li>
+                {% endif %}
+                
+                {% if material.melting_point %}
+                <li class="property-item">
+                    <span class="property-label">Melting Point</span>
+                    <span class="property-value">{{ material.melting_point }} °C</span>
+                </li>
+                {% endif %}
+                
+                {% if material.thermal_conductivity %}
+                <li class="property-item">
+                    <span class="property-label">Thermal Conductivity</span>
+                    <span class="property-value">{{ material.thermal_conductivity }} W/m·K</span>
+                </li>
+                {% endif %}
+                
+                {% if material.corrosion_resistance_score %}
+                <li class="property-item">
+                    <span class="property-label">Corrosion Resistance</span>
+                    <span class="property-value">{{ material.corrosion_resistance_score }}/10</span>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+        
+        <!-- Additional Properties -->
+        <div class="info-card">
+            <h2 class="card-title">Additional Properties</h2>
+            {% if properties %}
+                <ul class="property-list">
+                    {% for prop in properties %}
+                    <li class="property-item">
+                        <span class="property-label">{{ prop.key_display }}</span>
+                        <span class="property-value">
+                            {% if prop.float_value %}
+                                {{ prop.float_value }}
+                            {% else %}
+                                {{ prop.text_value }}
+                            {% endif %}
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="no-data">No additional properties available</div>
+            {% endif %}
+        </div>
+        
+        <!-- Environment Compatibility -->
+        <div class="info-card full-width-card">
+            <h2 class="card-title">Environment Compatibility</h2>
+            {% if compatibilities %}
+                <div class="compatibility-grid">
+                    {% for compat in compatibilities %}
+                    <div class="compatibility-item">
+                        <div class="compat-header">
+                            <span class="compat-name">{{ compat.environment.name }}</span>
+                            <span class="compat-score {% if compat.compatibility_score >= 7 %}high{% elif compat.compatibility_score >= 4 %}medium{% else %}low{% endif %}">
+                                {{ compat.compatibility_score }}/10
+                            </span>
+                        </div>
+                        {% if compat.degradation_behavior %}
+                            <div class="compat-behavior">{{ compat.degradation_behavior }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-data">No environment compatibility data available</div>
+            {% endif %}
+        </div>
+        
+        <!-- Applications -->
+        {% if applications %}
+        <div class="info-card full-width-card">
+            <h2 class="card-title">Recommended Applications</h2>
+            <div class="compatibility-grid">
+                {% for app in applications %}
+                <div class="compatibility-item">
+                    <div class="compat-header">
+                        <span class="compat-name">{{ app.application.name }}</span>
+                        <span class="compat-score {% if app.suitability_score >= 7 %}high{% elif app.suitability_score >= 4 %}medium{% else %}low{% endif %}">
+                            {{ app.suitability_score }}/10
+                        </span>
+                    </div>
+                    {% if app.reasons %}
+                        <div class="compat-behavior">{{ app.reasons }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+</main>
+{% endblock %}
+
+{% block body_scripts %}
+{% endblock %}
