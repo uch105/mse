@@ -10,7 +10,7 @@ from .intent_classifier import IntentClassifier
 
 
 # Initialize global instances
-#query_engine = MaterialQueryEngine()
+query_engine = MaterialQueryEngine()
 intent_classifier = IntentClassifier()
 
 
