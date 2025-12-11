@@ -92,9 +92,9 @@ def generate_captcha():
 
     # Load multiple fonts (you can add more paths)
     fonts = [
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-        "/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf",
-        "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf"
+        "/home/uch/mse/captcha_fonts/DejaVuSans-Bold.ttf",
+        "/home/uch/mse/captcha_fonts/LiberationSerif-Bold.ttf",
+        "/home/uch/mse/captcha_fonts/FreeSansBold.ttf"
     ]
     font = ImageFont.truetype(random.choice(fonts), 42)
 
