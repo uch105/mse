@@ -75,28 +75,31 @@ Pricing - MatSci Hub
 {% block body %}
 <section id="pricing" class="section" style="margin-top: 20px;">
     <div class="container">
-        <h2 class="section-title">Choose Your Plan</h2>
-        <p class="section-subtitle">Flexible pricing options to suit researchers, students, and professionals</p>
-        
+        <h2 class="section-title">Support Our Community</h2>
+        <p class="section-subtitle">
+            Running this forum isn’t free—we cover hosting, backups, security, and essential maintenance. If our community has been valuable to you, please consider helping us offset these costs with a one-time or recurring donation.
+Your support ensures that we can continue running smoothly for everyone.
+        </p>
+
         <div class="pricing-cards">
             <div class="card pricing-card">
-                <h3>Free</h3>
-                <div class="price">&#x24;0 <span>/month</span></div>
+                <h3>Free Access</h3>
+                <div class="price">&#x24;0 <span>/forever</span></div>
                 <ul class="pricing-features">
-                    <li>100 MatSciChat queries per day</li>
-                    <li>Basic learning resources</li>
+                    <li>Full access to the forum</li>
+                    <li>No paywalls or locked features</li>
                 </ul>
-                <a href="{% url 'register' %}" class="btn btn-secondary">Get Started</a>
+                <a href="{% url 'register' %}" class="btn btn-secondary">Join the Community</a>
             </div>
-            
+
             <div class="card pricing-card featured">
-                <h3>Pro</h3>
-                <div class="price">&#x24;10 <span>/month</span></div>
+                <h3>Support the Forum</h3>
+                <div class="price">Your Choice <span>/donation</span></div>
                 <ul class="pricing-features">
-                    <li>Unlimited MatSciChat queries</li>
-                    <li>Premium learning resources</li>
+                    <li>Helps cover hosting and server maintenance</li>
+                    <li>Keeps the site fast, stable, and ad-free</li>
                 </ul>
-                <a href="{% url 'checkout' %}?plan=pro" class="btn btn-primary">Get Started</a>
+                <a href="mailto:matscihubofficial@gmail.com" class="btn btn-primary">Donate</a>
             </div>
         </div>
     </div>
