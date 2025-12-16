@@ -75,9 +75,8 @@ def element_detail(request, symbol):
     """Show materials related to a specific element"""
     # Search for materials containing the element
     materials = Material.objects.filter(
-        Q(name__icontains=symbol) |
-        Q(other_names__icontains=symbol) |
-        Q(description__icontains=symbol)
+        Q(name=symbol) |
+        Q(other_names=symbol)
     )
     
     context = {
