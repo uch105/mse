@@ -27,9 +27,12 @@ INSTALLED_APPS = [
     "blogs",
     "forum",
     "django_crontab",
+    "django_hosts",
+    "team",
 ]
 
 MIDDLEWARE = [
+    'django_hosts.middleware.HostsRequestMiddleware', # always first
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -37,9 +40,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_hosts.middleware.HostsResponseMiddleware', # always last
 ]
 
 ROOT_URLCONF = 'config.urls'
+ROOT_HOSTCONF = 'config.hosts'
+DEFAULT_HOST = 'www'
 
 TEMPLATES = [
     {
@@ -138,12 +144,20 @@ USE_TZ = True
 
 
 if DEBUG:
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
+    # SESSION_COOKIE_SECURE = None
+    # CSRF_COOKIE_SECURE = None
+    CSRF_COOKIE_DOMAIN = '.127.0.0.1'
+    SESSION_COOKIE_DOMAIN = '.127.0.0.1'
+
+    # CSRF_COOKIE_NAME = "csrfmiddlewaretoken"
+
+    CSRF_TRUSTED_ORIGINS = ['http://*.localhost', 'http://localhost:8000', 'http://team.127.0.0.1:8000', 'http://127.0.0.1:8000']
 else:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_DOMAIN = ".materialsscience.net"
+    CSRF_COOKIE_DOMAIN = ".materialsscience.net"
 
     CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS').split(',')
 
