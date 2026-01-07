@@ -120,6 +120,8 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
 
+AUTH_USER_MODEL = 'core.User'
+
 CRONJOBS = [
     ('0 9 * * *', 'core.cron.send_new_content_notifications'),
 ]
