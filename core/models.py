@@ -293,164 +293,6 @@ class TeamMember(models.Model):
     def __str__(self):
         return f"{self.profile.full_name} - {self.role}"
 
-
-
-# ===========================================
-# Blogs Section
-# ===========================================
-
-
-class BlogCategory(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(max_length=100, unique=True, blank=True)
-    description = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name_plural = "Blog Categories"
-        ordering = ['name']
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-
-class Blog(models.Model):
-    STATUS_CHOICES = [
-        ('draft', 'Draft'),
-        ('published', 'Published'),
-    ]
-
-    title = models.CharField(max_length=250)
-    slug = models.SlugField(max_length=250, unique=True, blank=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blogs')
-    category = models.ForeignKey(BlogCategory, on_delete=models.SET_NULL, null=True, related_name='blogs')
-    
-    # Meta Information
-    featured_image = models.ImageField(upload_to='blog_images/', blank=True, null=True)
-    excerpt = models.TextField(max_length=300, help_text="Brief description (max 300 chars)")
-    
-    # Content
-    content = models.TextField(help_text="Main blog content with HTML support")
-    
-    # SEO
-    meta_description = models.CharField(max_length=160, blank=True)
-    meta_keywords = models.CharField(max_length=250, blank=True)
-    
-    # Status & Analytics
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
-    views = models.PositiveIntegerField(default=0)
-    read_time = models.PositiveIntegerField(default=5, help_text="Estimated read time in minutes")
-    
-    # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    published_at = models.DateTimeField(null=True, blank=True)
-    
-    # Featured & Trending
-    is_featured = models.BooleanField(default=False)
-    is_trending = models.BooleanField(default=False)
-    notified = models.BooleanField(default=False)
-
-    class Meta:
-        ordering = ['-published_at', '-created_at']
-        indexes = [
-            models.Index(fields=['-published_at']),
-            models.Index(fields=['slug']),
-        ]
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        
-        # Auto-calculate read time based on content
-        if self.content:
-            word_count = len(self.content.split())
-            self.read_time = max(1, word_count // 200)  # Average reading speed: 200 words/min
-        
-        super().save(*args, **kwargs)
-
-    def get_absolute_url(self):
-        return reverse('blog_detail', kwargs={'slug': self.slug})
-
-    def increment_views(self):
-        self.views += 1
-        self.save(update_fields=['views'])
-
-    def __str__(self):
-        return self.title
-
-
-class BlogSection(models.Model):
-    SECTION_TYPES = [
-        ('text', 'Text'),
-        ('image', 'Image'),
-        ('video', 'Video'),
-        ('quote', 'Quote'),
-        ('code', 'Code'),
-    ]
-
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='sections')
-    section_type = models.CharField(max_length=10, choices=SECTION_TYPES, default='text')
-    order = models.PositiveIntegerField(default=0)
-    
-    # Content fields
-    title = models.CharField(max_length=250, blank=True)
-    content = models.TextField(blank=True)
-    image = models.ImageField(upload_to='blog_sections/', blank=True, null=True)
-    video_url = models.URLField(blank=True, help_text="YouTube or Vimeo URL")
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['order']
-
-    def __str__(self):
-        return f"{self.blog.title} - Section {self.order}"
-
-
-class BlogComment(models.Model):
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_comments')
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
-    
-    content = models.TextField()
-    
-    is_approved = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"Comment by {self.user.username} on {self.blog.title}"
-
-    def get_replies(self):
-        return BlogComment.objects.filter(parent=self, is_approved=True)
-
-
-class BlogShare(models.Model):
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='shares')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    platform = models.CharField(max_length=50)  # facebook, twitter, linkedin, etc.
-    shared_at = models.DateTimeField(auto_now_add=True)
-    ip_address = models.GenericIPAddressField(null=True, blank=True)
-
-    class Meta:
-        ordering = ['-shared_at']
-
-    def __str__(self):
-        return f"{self.blog.title} shared on {self.platform}"
-    
-
-
-
-
 # ===========================================
 # Forum Models
 # ===========================================
@@ -787,3 +629,78 @@ class Report(models.Model):
         elif self.reply:
             return f"Report on reply by {self.reply.author.username}"
         return f"Report by {self.reporter.username}"
+    
+# ===========================================
+# Blogs Models
+# ===========================================
+'''
+class Blog(models.Model):
+    STATUS_CHOICES = [
+        ('drafted', 'Drafted'),
+        ('submitted', 'Submitted'),
+        ('published', 'Published'),
+    ]
+    
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blogs')
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=250, unique=True, blank=True)
+    content = models.TextField()
+    keywords = models.CharField(max_length=500, help_text="Comma-separated keywords")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='drafted')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published_at = models.DateTimeField(null=True, blank=True)
+    
+    likes = models.ManyToManyField(User, related_name='liked_blogs', blank=True)
+    dislikes = models.ManyToManyField(User, related_name='disliked_blogs', blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['status']),
+        ]
+    
+    def __str__(self):
+        return self.title
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            while Blog.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+    
+    def get_absolute_url(self):
+        return reverse('blog_detail', kwargs={'slug': self.slug})
+    
+    @property
+    def like_count(self):
+        return self.likes.count()
+    
+    @property
+    def dislike_count(self):
+        return self.dislikes.count()
+    
+    def get_keywords_list(self):
+        return [k.strip() for k in self.keywords.split(',') if k.strip()]
+
+
+class BlogImage(models.Model):
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='blog_images/%Y/%m/%d/')
+    caption = models.CharField(max_length=200, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['uploaded_at']
+    
+    def __str__(self):
+        return f"Image for {self.blog.title}"
+
+        '''

@@ -28,6 +28,16 @@ urlpatterns = [
     path('api-docs/', views.apidocs, name='api-docs'),
     path('pricing/', views.pricing, name='pricing'),
     path('checkout/', views.checkout, name='checkout'),
+
+    # Blog URLs
+    #path('blogs/', views.blog_list, name='blog_list'),
+    #path('blogs/create/', views.blog_create, name='blog_create'),
+    #path('blogs/my-blogs/', views.my_blogs, name='my_blogs'),
+    #path('blogs/upload-image/', views.upload_blog_image, name='upload_blog_image'),
+    #path('blogs/<slug:slug>/', views.blog_detail, name='blog_detail'),
+    #path('blogs/<slug:slug>/edit/', views.blog_edit, name='blog_edit'),
+    #path('blogs/<slug:slug>/like/', views.blog_like, name='blog_like'),
+    #path('blogs/<slug:slug>/dislike/', views.blog_dislike, name='blog_dislike'),
 ]
 
 from django.urls import re_path

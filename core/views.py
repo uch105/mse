@@ -548,3 +548,162 @@ def resource_download(request, resource_id):
         return response
     except Exception as e:
         raise Http404("File not found")
+    
+
+
+# ========================================
+# Blog Views
+# ========================================
+'''
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.db.models import Q
+from django.utils import timezone
+from django.views.decorators.http import require_POST
+from .models import Blog, BlogImage
+import json
+
+def blog_list(request):
+    query = request.GET.get('q', '')
+    blogs = Blog.objects.filter(status='published')
+    
+    if query:
+        keywords = [k.strip() for k in query.split(',')]
+        q_objects = Q()
+        for keyword in keywords:
+            q_objects |= Q(title__icontains=keyword) | Q(keywords__icontains=keyword) | Q(content__icontains=keyword)
+        blogs = blogs.filter(q_objects)
+    
+    return render(request, 'blogs/blog_list.html', {
+        'blogs': blogs,
+        'query': query
+    })
+
+def blog_detail(request, slug):
+    blog = get_object_or_404(Blog, slug=slug)
+    
+    if blog.status != 'published' and blog.author != request.user:
+        return redirect('blog_list')
+    
+    user_liked = request.user.is_authenticated and blog.likes.filter(id=request.user.id).exists()
+    user_disliked = request.user.is_authenticated and blog.dislikes.filter(id=request.user.id).exists()
+    
+    return render(request, 'blogs/blog_detail.html', {
+        'blog': blog,
+        'user_liked': user_liked,
+        'user_disliked': user_disliked
+    })
+
+@login_required
+def blog_create(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        keywords = request.POST.get('keywords', '')
+        status = request.POST.get('status', 'drafted')
+        
+        blog = Blog.objects.create(
+            author=request.user,
+            title=title,
+            content=content,
+            keywords=keywords,
+            status=status
+        )
+        
+        if status == 'published':
+            blog.published_at = timezone.now()
+            blog.save()
+        
+        return redirect('blog_detail', slug=blog.slug)
+    
+    return render(request, 'blogs/blog_create.html')
+
+@login_required
+def blog_edit(request, slug):
+    blog = get_object_or_404(Blog, slug=slug, author=request.user)
+    
+    if request.method == 'POST':
+        blog.title = request.POST.get('title')
+        blog.content = request.POST.get('content')
+        blog.keywords = request.POST.get('keywords', '')
+        new_status = request.POST.get('status', blog.status)
+        
+        if new_status == 'published' and blog.status != 'published':
+            blog.published_at = timezone.now()
+        
+        blog.status = new_status
+        blog.save()
+        
+        return redirect('blog_detail', slug=blog.slug)
+    
+    return render(request, 'blogs/blog_edit.html', {'blog': blog})
+
+@login_required
+def my_blogs(request):
+    blogs = Blog.objects.filter(author=request.user)
+    return render(request, 'blogs/my_blogs.html', {'blogs': blogs})
+
+@login_required
+@require_POST
+def blog_like(request, slug):
+    blog = get_object_or_404(Blog, slug=slug)
+    
+    if blog.likes.filter(id=request.user.id).exists():
+        blog.likes.remove(request.user)
+        liked = False
+    else:
+        blog.likes.add(request.user)
+        blog.dislikes.remove(request.user)
+        liked = True
+    
+    return JsonResponse({
+        'liked': liked,
+        'like_count': blog.like_count,
+        'dislike_count': blog.dislike_count
+    })
+
+@login_required
+@require_POST
+def blog_dislike(request, slug):
+    blog = get_object_or_404(Blog, slug=slug)
+    
+    if blog.dislikes.filter(id=request.user.id).exists():
+        blog.dislikes.remove(request.user)
+        disliked = False
+    else:
+        blog.dislikes.add(request.user)
+        blog.likes.remove(request.user)
+        disliked = True
+    
+    return JsonResponse({
+        'disliked': disliked,
+        'like_count': blog.like_count,
+        'dislike_count': blog.dislike_count
+    })
+
+@login_required
+@require_POST
+def upload_blog_image(request):
+    if request.FILES.get('image'):
+        image = request.FILES['image']
+        blog_id = request.POST.get('blog_id')
+        
+        if blog_id:
+            blog = get_object_or_404(Blog, id=blog_id, author=request.user)
+            blog_image = BlogImage.objects.create(blog=blog, image=image)
+        else:
+            # Temporary upload for new blogs
+            blog_image = BlogImage.objects.create(
+                blog=None,
+                image=image
+            )
+        
+        return JsonResponse({
+            'success': True,
+            'url': blog_image.image.url,
+            'id': blog_image.id
+        })
+    
+    return JsonResponse({'success': False, 'error': 'No image provided'}, status=400)
+    '''
