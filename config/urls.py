@@ -7,7 +7,6 @@ urlpatterns = [
     path('materials/', include('materials.urls')),
     path('matscichat/', include('matscichat.urls')),
     path('forum/', include('forum.urls')),
-    path('blogs/', include('blogs.urls')),
 ]
 
 from django.conf import settings

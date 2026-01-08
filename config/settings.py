@@ -24,11 +24,9 @@ INSTALLED_APPS = [
     "core",
     "materials",
     "matscichat",
-    "blogs",
     "forum",
     "django_crontab",
     "django_hosts",
-    "team",
 ]
 
 MIDDLEWARE = [
