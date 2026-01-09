@@ -633,7 +633,7 @@ class Report(models.Model):
 # ===========================================
 # Blogs Models
 # ===========================================
-'''
+
 class Blog(models.Model):
     STATUS_CHOICES = [
         ('drafted', 'Drafted'),
@@ -692,7 +692,7 @@ class Blog(models.Model):
 
 
 class BlogImage(models.Model):
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='images')
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='images', null=True, blank=True)
     image = models.ImageField(upload_to='blog_images/%Y/%m/%d/')
     caption = models.CharField(max_length=200, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
@@ -701,6 +701,4 @@ class BlogImage(models.Model):
         ordering = ['uploaded_at']
     
     def __str__(self):
-        return f"Image for {self.blog.title}"
-
-        '''
+        return f"Image for {self.blog.title if self.blog else 'Unassigned'}"

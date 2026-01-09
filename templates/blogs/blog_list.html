@@ -6,85 +6,208 @@ Blogs
 {% endblock %}
 
 {% block meta_links %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block head_scripts %}
+<style>
+.blog-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.blog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.blog-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.blog-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.search-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.search-input {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.blog-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    transition: box-shadow 0.2s;
+}
+
+.blog-card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.blog-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+}
+
+.blog-card-title a {
+    color: #111827;
+    text-decoration: none;
+}
+
+.blog-card-title a:hover {
+    color: #3b82f6;
+}
+
+.blog-card-meta {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.blog-card-content {
+    color: #374151;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.blog-keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.keyword-tag {
+    padding: 0.25rem 0.5rem;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: 0.75rem;
+    border-radius: 4px;
+}
+
+.blog-stats {
+    display: flex;
+    gap: 1rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-message {
+    color: #6b7280;
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+}
+@media screen and (max-width: 600px) {
+    .btn {
+        text-align: center;
+        border-radius: 10px;
+        width: auto;
+    }
+    .blog-header {
+        gap: 1rem;
+    }
+    .blog-header a {
+        font-size: 0.875rem;
+        width: 100px;
+        padding: 5px 10px;
+    }
+}
+</style>
 {% endblock %}
 
 {% block body %}
 <main>
-<div class="container mx-auto px-4 py-8">
-    <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold">Blogs</h1>
+<div class="blog-container">
+    <div class="blog-header">
+        <h1 class="blog-title">Blogs</h1>
         {% if user.is_authenticated %}
-        <div class="space-x-4">
-            <a href="{% url 'my_blogs' %}" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">My Blogs</a>
-            <a href="{% url 'blog_create' %}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Create Blog</a>
+        <div class="blog-actions">
+            <a href="{% url 'my_blogs' %}" class="btn btn-secondary">My Blogs</a>
+            <a href="{% url 'blog_create' %}" class="btn btn-primary">Create Blog</a>
         </div>
         {% endif %}
     </div>
     
-    <div class="mb-6">
-        <form method="get" class="flex gap-2">
-            <input 
-                type="text" 
-                name="q" 
-                value="{{ query }}"
-                placeholder="Search blogs (comma-separated keywords)..." 
-                class="flex-1 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                Search
-            </button>
-            {% if query %}
-            <a href="{% url 'blog_list' %}" class="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
-                Clear
-            </a>
-            {% endif %}
-        </form>
-    </div>
+    <form method="get" class="search-form">
+        <input 
+            type="text" 
+            name="q" 
+            value="{{ query }}"
+            placeholder="Search blogs ( you can use keywords)..." 
+            class="search-input"
+        >
+        <button type="submit" class="btn btn-primary">Search</button>
+        {% if query %}
+        <a href="{% url 'blog_list' %}" class="btn btn-secondary">Clear</a>
+        {% endif %}
+    </form>
     
     {% if blogs %}
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div class="blog-grid">
         {% for blog in blogs %}
-        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-            <div class="p-6">
-                <h2 class="text-xl font-semibold mb-2">
-                    <a href="{% url 'blog_detail' blog.slug %}" class="text-gray-900 hover:text-blue-600">
-                        {{ blog.title }}
-                    </a>
-                </h2>
-                <p class="text-gray-600 text-sm mb-4">
-                    by {{ blog.author.username }} • {{ blog.published_at|date:"M d, Y" }}
-                </p>
-                <p class="text-gray-700 mb-4 line-clamp-3">
-                    {{ blog.content|striptags|truncatewords:30 }}
-                </p>
-                {% if blog.keywords %}
-                <div class="flex flex-wrap gap-2 mb-4">
-                    {% for keyword in blog.get_keywords_list %}
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
-                        {{ keyword }}
-                    </span>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                <div class="flex items-center gap-4 text-sm text-gray-600">
-                    <span>👍 {{ blog.like_count }}</span>
-                    <span>👎 {{ blog.dislike_count }}</span>
-                </div>
+        <div class="blog-card">
+            <h2 class="blog-card-title">
+                <a href="{% url 'blog_detail' blog.slug %}">{{ blog.title }}</a>
+            </h2>
+            <div class="blog-card-meta">
+                by {{ blog.author.username }} • {{ blog.published_at|date:"M d, Y" }}
+            </div>
+            <div class="blog-card-content">
+                {{ blog.content|striptags|truncatewords:30 }}
+            </div>
+            {% if blog.keywords %}
+            <div class="blog-keywords">
+                {% for keyword in blog.get_keywords_list %}
+                <span class="keyword-tag">{{ keyword }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="blog-stats">
+                <span>👍 {{ blog.like_count }}</span>
+                <span>👎 {{ blog.dislike_count }}</span>
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <div class="text-center py-12">
-        <p class="text-gray-600 text-lg">No blogs found.</p>
+    <div class="empty-state">
+        <p class="empty-message">No blogs found.</p>
         {% if user.is_authenticated %}
-        <a href="{% url 'blog_create' %}" class="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-            Create First Blog
-        </a>
+        <a href="{% url 'blog_create' %}" class="btn btn-primary">Create First Blog</a>
         {% endif %}
     </div>
     {% endif %}
@@ -93,6 +216,4 @@ Blogs
 {% endblock %}
 
 {% block body_scripts %}
-<!-- Bootstrap JS Bundle - Always last -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

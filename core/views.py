@@ -18,6 +18,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 import requests
 from core.models import *
 from core.utils import send_email
@@ -554,7 +555,7 @@ def resource_download(request, resource_id):
 # ========================================
 # Blog Views
 # ========================================
-'''
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -580,7 +581,15 @@ def blog_list(request):
         'query': query
     })
 
+def user_blog_list(request, pk):
+    blogs = Blog.objects.filter(status='published', author__username=pk)
+    
+    return render(request, 'blogs/blog_list.html', {
+        'blogs': blogs,
+    })
+
 def blog_detail(request, slug):
+    print("Fetching blog detail for slug:", slug)
     blog = get_object_or_404(Blog, slug=slug)
     
     if blog.status != 'published' and blog.author != request.user:
@@ -595,7 +604,7 @@ def blog_detail(request, slug):
         'user_disliked': user_disliked
     })
 
-@login_required
+@login_required(login_url='login')
 def blog_create(request):
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -614,12 +623,23 @@ def blog_create(request):
         if status == 'published':
             blog.published_at = timezone.now()
             blog.save()
+
+        # Associate any unassigned images that are referenced in the content
+        unassigned_images = BlogImage.objects.filter(blog__isnull=True)
+        for img in unassigned_images:
+            if img.image.url in content:
+                img.blog = blog
+                img.save()
+        
+        # Clean up old unassigned images (older than 1 hour)
+        one_hour_ago = timezone.now() - timezone.timedelta(hours=1)
+        BlogImage.objects.filter(blog__isnull=True, uploaded_at__lt=one_hour_ago).delete()
         
         return redirect('blog_detail', slug=blog.slug)
     
     return render(request, 'blogs/blog_create.html')
 
-@login_required
+@login_required(login_url='login')
 def blog_edit(request, slug):
     blog = get_object_or_404(Blog, slug=slug, author=request.user)
     
@@ -639,12 +659,24 @@ def blog_edit(request, slug):
     
     return render(request, 'blogs/blog_edit.html', {'blog': blog})
 
-@login_required
+@login_required(login_url='login')
 def my_blogs(request):
     blogs = Blog.objects.filter(author=request.user)
     return render(request, 'blogs/my_blogs.html', {'blogs': blogs})
 
-@login_required
+@staff_member_required(login_url='login')
+def admin_blog_list(request):
+    blogs = Blog.objects.all()
+    return render(request, 'blogs/admin_blog_list.html', {'blogs': blogs})
+
+@staff_member_required(login_url='login')
+def admin_blog_delete(request, slug):
+    blog = get_object_or_404(Blog, slug=slug)
+    blog.delete()
+    messages.success(request, 'Blog deleted successfully.')
+    return redirect('admin_blog_list')
+
+@login_required(login_url='login')
 @require_POST
 def blog_like(request, slug):
     blog = get_object_or_404(Blog, slug=slug)
@@ -663,7 +695,7 @@ def blog_like(request, slug):
         'dislike_count': blog.dislike_count
     })
 
-@login_required
+@login_required(login_url='login')
 @require_POST
 def blog_dislike(request, slug):
     blog = get_object_or_404(Blog, slug=slug)
@@ -682,7 +714,7 @@ def blog_dislike(request, slug):
         'dislike_count': blog.dislike_count
     })
 
-@login_required
+@login_required(login_url='login')
 @require_POST
 def upload_blog_image(request):
     if request.FILES.get('image'):
@@ -690,14 +722,12 @@ def upload_blog_image(request):
         blog_id = request.POST.get('blog_id')
         
         if blog_id:
+            # Editing existing blog
             blog = get_object_or_404(Blog, id=blog_id, author=request.user)
             blog_image = BlogImage.objects.create(blog=blog, image=image)
         else:
-            # Temporary upload for new blogs
-            blog_image = BlogImage.objects.create(
-                blog=None,
-                image=image
-            )
+            # Creating new blog - store without blog association
+            blog_image = BlogImage.objects.create(image=image)
         
         return JsonResponse({
             'success': True,
@@ -706,4 +736,3 @@ def upload_blog_image(request):
         })
     
     return JsonResponse({'success': False, 'error': 'No image provided'}, status=400)
-    '''

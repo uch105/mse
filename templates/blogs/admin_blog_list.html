@@ -124,12 +124,12 @@ My Blogs
     font-size: 0.875rem;
 }
 
-.btn-edit {
+.btn-delete {
     background: #3b82f6;
     color: white;
 }
 
-.btn-edit:hover {
+.btn-delete:hover {
     background: #2563eb;
 }
 
@@ -162,7 +162,7 @@ My Blogs
 <main>
 <div class="my-blogs-container">
     <div class="my-blogs-header">
-        <h1 class="my-blogs-title">My Blogs</h1>
+        <h1 class="my-blogs-title">All Blogs</h1>
         <a href="{% url 'blog_create' %}" class="create-blog-btn">Create New Blog</a>
     </div>
     
@@ -203,11 +203,11 @@ My Blogs
                     </td>
                     <td>
                         <div class="blog-actions">
-                            <a href="{% url 'blog_edit' blog.slug %}" class="action-btn btn-edit">
-                                Edit
-                            </a>
                             <a href="{% url 'blog_detail' blog.slug %}" class="action-btn btn-view">
                                 View
+                            </a>
+                            <a href="{% url 'admin_blog_delete' blog.slug %}" class="action-btn btn-delete">
+                                Delete
                             </a>
                         </div>
                     </td>
