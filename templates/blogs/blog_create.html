@@ -201,6 +201,7 @@ body {
                         <button type="button" class="toolbar-btn" onclick="insertTag('p')">Paragraph</button>
                         <button type="button" class="toolbar-btn" onclick="insertList('ul')">• List</button>
                         <button type="button" class="toolbar-btn" onclick="insertList('ol')">1. List</button>
+                        <button type="button" class="toolbar-btn" onclick="insertBreak()">New Line</button>
                         <button type="button" class="toolbar-btn" onclick="insertLink()">🔗 Link</button>
                         <input type="file" id="imageUpload" accept="image/*" style="display:none" onchange="uploadImage()">
                         <button type="button" class="toolbar-btn" onclick="document.getElementById('imageUpload').click()">🖼️ Image</button>
@@ -284,6 +285,21 @@ function insertList(type) {
     
     const listHtml = `<${type}>\n  <li>Item 1</li>\n  <li>Item 2</li>\n  <li>Item 3</li>\n</${type}>`;
     textarea.value = beforeText + listHtml + afterText;
+    
+    updatePreview();
+    textarea.focus();
+}
+
+function insertBreak() {
+    const textarea = document.getElementById('content');
+    const start = textarea.selectionStart;
+    const beforeText = textarea.value.substring(0, start);
+    const afterText = textarea.value.substring(start);
+    
+    textarea.value = beforeText + '<br>' + afterText;
+    
+    // Move cursor after the <br> tag
+    textarea.selectionStart = textarea.selectionEnd = start + 4;
     
     updatePreview();
     textarea.focus();
