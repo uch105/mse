@@ -645,7 +645,7 @@ class Blog(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=250, unique=True, blank=True)
     content = models.TextField()
-    keywords = models.CharField(max_length=500, help_text="Comma-separated keywords")
+    keywords = models.CharField(max_length=500, help_text="Comma-separated keywords", null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='drafted')
     
     created_at = models.DateTimeField(auto_now_add=True)
