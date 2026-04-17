@@ -1,3 +1,9 @@
+---
+
+# [Deprecated Codebase. New version has been written in Rust. [See new repository](https://github.com/tanvirsaklan/mse.git)]
+
+---
+
 # 🧪 Materials Science Hub
 
 > **An intelligent community platform for materials science enthusiasts, researchers, and engineers — powered by Django, REST API, and Machine Learning.**
